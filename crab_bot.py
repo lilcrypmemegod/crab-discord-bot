@@ -13,39 +13,58 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 
 PAIR_API = "https://api.dexscreener.com/latest/dex/pairs/cronos/0xdf9030e28cde0f4e6f11c65362c5e152093c7414"
 
+# Replace these with your crab-with-knife gifs
 crab_gifs = [
-    "https://media.giphy.com/media/Y4nmq4GOnLf4XIgALX/giphy.gif",
-    "https://media.giphy.com/media/kGdP6qyP3xTS2efTW0/giphy.gif",
-    "https://media.giphy.com/media/3o7TKMt1VVNkHV2PaE/giphy.gif",
-    "https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif"
+    "https://i.imgur.com/3ZQ3Z9E.gif",
+    "https://i.imgur.com/B3h9M4Q.gif",
+    "https://i.imgur.com/kd7U6sF.gif"
 ]
+
+
+class CrabButton(discord.ui.View):
+
+    @discord.ui.button(label="CRAB", style=discord.ButtonStyle.danger)
+    async def crab_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+
+        gif = random.choice(crab_gifs)
+
+        embed = discord.Embed(
+            description="🦀 **SOMEONE PRESSED THE CRAB BUTTON** 🔪",
+            color=0xff0000
+        )
+
+        embed.set_image(url=gif)
+
+        await interaction.response.send_message(embed=embed)
+
 
 @bot.event
 async def on_ready():
     print(f"Bot connected as {bot.user}")
 
+
 @bot.command(name="crab")
 async def crab(ctx):
-    try:
-        r = requests.get(PAIR_API)
-        data = r.json()
 
-        pair = data["pair"]
-        mc = pair.get("marketCap") or pair.get("fdv")
+    r = requests.get(PAIR_API)
+    data = r.json()
 
-        if mc >= 1_000_000:
-            mc_text = f"${round(mc/1_000_000,2)}M"
-        elif mc >= 1_000:
-            mc_text = f"${round(mc/1_000,2)}K"
-        else:
-            mc_text = f"${mc}"
+    pair = data["pair"]
+    mc = pair.get("marketCap") or pair.get("fdv")
 
-        gif = random.choice(crab_gifs)
+    if mc >= 1_000_000:
+        mc_text = f"${round(mc/1_000_000,2)}M"
+    elif mc >= 1_000:
+        mc_text = f"${round(mc/1_000,2)}K"
+    else:
+        mc_text = f"${mc}"
 
-        await ctx.send(f"🦀🔪 **CRAB WITH KNIFE**\nMC - {mc_text}\n{gif}")
+    embed = discord.Embed(
+        description=f"**MC - {mc_text}**\nDO NOT PRESS THE CRAB BUTTON.",
+        color=0xff0000
+    )
 
-    except Exception as e:
-        print(e)
-        await ctx.send("MC unavailable 🦀")
+    await ctx.send(embed=embed, view=CrabButton())
+
 
 bot.run(TOKEN)
