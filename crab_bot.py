@@ -1,5 +1,4 @@
 import discord
-from discord.ext import commands
 import requests
 import os
 import random
@@ -9,7 +8,7 @@ TOKEN = os.getenv("TOKEN")
 intents = discord.Intents.default()
 intents.message_content = True
 
-bot = commands.Bot(command_prefix="!", intents=intents)
+client = discord.Client(intents=intents)
 
 PAIR_API = "https://api.dexscreener.com/latest/dex/pairs/cronos/0xdf9030e28cde0f4e6f11c65362c5e152093c7414"
 
@@ -21,7 +20,6 @@ crab_gifs = [
 
 
 def get_mc():
-
     r = requests.get(PAIR_API)
     data = r.json()
 
@@ -38,17 +36,14 @@ def get_mc():
 
 class CrabButton(discord.ui.View):
 
-    def __init__(self):
-        super().__init__(timeout=None)
-
     @discord.ui.button(label="CRAB", style=discord.ButtonStyle.danger)
-    async def crab(self, interaction: discord.Interaction, button: discord.ui.Button):
+    async def press(self, interaction: discord.Interaction, button: discord.ui.Button):
 
         mc = get_mc()
         gif = random.choice(crab_gifs)
 
         embed = discord.Embed(
-            description=f"SOMEONE PRESSED THE CRAB BUTTON 🔪\n\nMC - {mc}",
+            description=f"🦀 SOMEONE PRESSED THE CRAB BUTTON 🔪\n\nMC - {mc}",
             color=0xff0000
         )
 
@@ -57,21 +52,22 @@ class CrabButton(discord.ui.View):
         await interaction.response.send_message(embed=embed)
 
 
-@bot.event
+@client.event
 async def on_ready():
-    print(f"Bot connected as {bot.user}")
+    print("Crab bot ready")
 
 
-@bot.command()
-async def crab(ctx):
+@client.event
+async def on_message(message):
 
-    mc = get_mc()
-    gif = random.choice(crab_gifs)
+    if message.author == client.user:
+        return
 
-    user_text = ctx.message.content
+    # !crab command
+    if message.content == "!crab":
 
-    # LOWERCASE !crab
-    if user_text == "!crab":
+        mc = get_mc()
+        gif = random.choice(crab_gifs)
 
         embed = discord.Embed(
             description=f"MC - {mc}",
@@ -80,11 +76,13 @@ async def crab(ctx):
 
         embed.set_image(url=gif)
 
-        await ctx.send(embed=embed)
+        await message.channel.send(embed=embed)
 
+    # !CRAB command
+    if message.content == "!CRAB":
 
-    # UPPERCASE !CRAB
-    if user_text == "!CRAB":
+        mc = get_mc()
+        gif = random.choice(crab_gifs)
 
         embed = discord.Embed(
             description=f"MC - {mc}\nDO NOT PRESS THE CRAB BUTTON",
@@ -93,7 +91,7 @@ async def crab(ctx):
 
         embed.set_image(url=gif)
 
-        await ctx.send(embed=embed, view=CrabButton())
+        await message.channel.send(embed=embed, view=CrabButton())
 
 
-bot.run(TOKEN)
+client.run(TOKEN)
