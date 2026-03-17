@@ -14,11 +14,11 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 PAIR_API = "https://api.dexscreener.com/latest/dex/pairs/cronos/0xdf9030e28cde0f4e6f11c65362c5e152093c7414"
 
 crab_gifs = [
-"https://media.tenor.com/Au4dFOh5s5kAAAAC/licking-knife-crabby-crab.gif",
-"https://media.tenor.com/VXH0m2CqzLQAAAAC/crab-with-a-knife.gif",
-"https://media.tenor.com/FqJq3hM6nC8AAAAC/stabby-crab.gif",
-"https://media.tenor.com/704hC405kqAAAAAC/crab-knife-pandlr.gif",
-"https://media.tenor.com/6sHqS4b3ZPAAAAAC/crab-knife-fight.gif"
+"https://tenor.com/view/licking-knife-crabby-crab-pikaole-threatening-menacing-gif-23124736",
+"https://tenor.com/view/fighting-crab-crab-with-a-knife-hes-got-a-knife-dont-touch-me-bro-get-off-gif-18793247",
+"https://tenor.com/view/threat-crabby-stabby-knife-stab-angry-gif-8684191936841762266",
+"https://tenor.com/view/caranguejo-pandlr-man-crab-knife-pandlrg-faca-caranguejo-gif-13381866007168454019",
+"https://tenor.com/view/crab-knife-fight-gif-7305809"
 ]
 
 
@@ -58,21 +58,16 @@ async def crab_blessing(ctx):
 
     username = ctx.author.display_name
 
-    embed = discord.Embed(
-        title="🦀 CRAB BLESSING 🦀",
-        description=f"🦀 **Congratulations {username}!**\n\nYou have received the **crab blessing**.\nThe crab gods have blessed you. 🦀",
-        color=0xff0000
+    await ctx.send(
+        f"🦀 **Congratulations {username}!**\n"
+        f"You have received the **crab blessing**.\n"
+        f"The crab gods have blessed you. 🦀"
     )
 
-    embed.set_image(url=random.choice(crab_gifs))
-
-    await ctx.send(embed=embed)
+    await ctx.send(random.choice(crab_gifs))
 
 
 class CrabButton(discord.ui.View):
-
-    def __init__(self):
-        super().__init__(timeout=None)
 
     @discord.ui.button(label="CRAB", style=discord.ButtonStyle.danger)
 
@@ -81,14 +76,12 @@ class CrabButton(discord.ui.View):
         mc = get_mc()
         gif = random.choice(crab_gifs)
 
-        embed = discord.Embed(
-            description=f"🦀 **{interaction.user.display_name} pressed the crab button**\n\nMC - {mc}",
-            color=0xff0000
+        await interaction.response.edit_message(
+            content=f"🦀 **{interaction.user.display_name} pressed the crab button**\n\nMC - {mc}",
+            view=None
         )
 
-        embed.set_image(url=gif)
-
-        await interaction.response.edit_message(embed=embed, view=None)
+        await interaction.channel.send(gif)
 
 
 @bot.event
@@ -101,14 +94,9 @@ async def crab(ctx):
 
     mc = get_mc()
 
-    embed = discord.Embed(
-        description=f"MC - {mc}",
-        color=0xff0000
-    )
+    await ctx.send(f"MC - {mc}")
 
-    embed.set_image(url=random.choice(crab_gifs))
-
-    await ctx.send(embed=embed)
+    await ctx.send(random.choice(crab_gifs))
 
     await crab_blessing(ctx)
 
@@ -118,12 +106,10 @@ async def CRAB(ctx):
 
     mc = get_mc()
 
-    embed = discord.Embed(
-        description=f"MC - {mc}\n\n**DO NOT PRESS THE CRAB BUTTON**",
-        color=0xff0000
+    await ctx.send(
+        f"MC - {mc}\n\n**DO NOT PRESS THE CRAB BUTTON**",
+        view=CrabButton()
     )
-
-    await ctx.send(embed=embed, view=CrabButton())
 
     await crab_blessing(ctx)
 
