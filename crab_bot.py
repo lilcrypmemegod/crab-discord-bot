@@ -11,7 +11,6 @@ intents.message_content = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-# KNIFE CRAB GIFS YOU SENT
 crab_gifs = [
 "https://tenor.com/view/licking-knife-crabby-crab-pikaole-threatening-menacing-gif-23124736",
 "https://tenor.com/view/fighting-crab-crab-with-a-knife-hes-got-a-knife-dont-touch-me-bro-get-off-gif-18793247",
@@ -53,18 +52,15 @@ async def on_ready():
     print(f"Crab bot online as {bot.user}")
 
 
-# RANDOM CRAB GIF COMMAND
 @bot.command()
 async def crab(ctx):
 
     await ctx.message.delete()
 
     gif = random.choice(crab_gifs)
-
     await ctx.send(gif)
 
 
-# CRAB BUTTON SPAWN
 @bot.command(name="CRAB")
 async def crab_button(ctx):
 
@@ -78,31 +74,52 @@ async def crab_button(ctx):
     await ctx.send(embed=embed, view=CrabButton())
 
 
-# RAID LOCK (ADMIN ONLY)
 @bot.command()
 @commands.has_permissions(administrator=True)
-async def lock(ctx, minutes: int):
+async def lock(ctx, minutes: int, raid_link: str = None):
 
     await ctx.message.delete()
 
     channel = ctx.channel
     guild = ctx.guild
 
-    overwrite = channel.overwrites_for(guild.default_role)
-    overwrite.send_messages = False
+    # lock every role except admins
+    for role in guild.roles:
+        if role.permissions.administrator:
+            continue
 
-    await channel.set_permissions(guild.default_role, overwrite=overwrite)
+        overwrite = channel.overwrites_for(role)
+        overwrite.send_messages = False
+        await channel.set_permissions(role, overwrite=overwrite)
 
-    await ctx.send("🚨🦀 CRAB RAID LOCKDOWN 🦀🚨\n🔒 Chat locked")
+    message_text = "🚨🦀 CRAB RAID LOCKDOWN 🦀🚨\n🔒 Chat locked\n"
+
+    if raid_link:
+        message_text += f"\nRAID HERE:\n{raid_link}\n"
+
+    countdown_msg = await ctx.send(message_text + f"\nUnlocking in: {minutes} minutes")
 
     gif = random.choice(crab_gifs)
-
     await ctx.send(gif)
 
-    await asyncio.sleep(minutes * 60)
+    remaining = minutes
 
-    overwrite.send_messages = None
-    await channel.set_permissions(guild.default_role, overwrite=overwrite)
+    while remaining > 0:
+        await asyncio.sleep(60)
+        remaining -= 1
 
+        if remaining > 0:
+            new_text = message_text + f"\nUnlocking in: {remaining} minutes"
+            await countdown_msg.edit(content=new_text)
+
+    # unlock silently
+    for role in guild.roles:
+        if role.permissions.administrator:
+            continue
+
+        overwrite = channel.overwrites_for(role)
+        overwrite.send_messages = None
+        await channel.set_permissions(role, overwrite=overwrite)
+    
 
 bot.run(TOKEN)
