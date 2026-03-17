@@ -78,7 +78,7 @@ async def crab_button(ctx):
 
 @bot.command()
 @commands.has_permissions(administrator=True)
-async def lock(ctx, minutes: int, raid_link: str = None):
+async def lock(ctx, minutes: int, raid_link: str):
 
     global lock_active
     lock_active = True
@@ -88,8 +88,9 @@ async def lock(ctx, minutes: int, raid_link: str = None):
     channel = ctx.channel
     guild = ctx.guild
 
-    # lock every role except admins
+    # LOCK CHAT
     for role in guild.roles:
+
         if role.permissions.administrator:
             continue
 
@@ -97,14 +98,16 @@ async def lock(ctx, minutes: int, raid_link: str = None):
         overwrite.send_messages = False
         await channel.set_permissions(role, overwrite=overwrite)
 
-    message_text = "🚨🦀 CRAB RAID LOCKDOWN 🦀🚨\n🔒 Chat locked\n"
-
-    if raid_link:
-        message_text += f"\nRAID HERE:\n{raid_link}\n"
-
-    countdown_msg = await ctx.send(message_text + f"\nUnlocking in: {minutes} minutes")
-
     gif = random.choice(crab_gifs)
+
+    raid_message = await ctx.send(
+        f"🚨🦀 **RAID ALERT** 🦀🚨\n"
+        f"@everyone\n\n"
+        f"⚔️ RAID HERE ⚔️\n{raid_link}\n\n"
+        f"🔒 Chat locked\n"
+        f"⏳ Unlocking in: {minutes} minutes"
+    )
+
     await ctx.send(gif)
 
     remaining = minutes
@@ -115,12 +118,21 @@ async def lock(ctx, minutes: int, raid_link: str = None):
         remaining -= 1
 
         if remaining > 0:
-            new_text = message_text + f"\nUnlocking in: {remaining} minutes"
-            await countdown_msg.edit(content=new_text)
 
-    # unlock silently
+            await raid_message.edit(
+                content=
+                f"🚨🦀 **RAID ALERT** 🦀🚨\n"
+                f"@everyone\n\n"
+                f"⚔️ RAID HERE ⚔️\n{raid_link}\n\n"
+                f"🔒 Chat locked\n"
+                f"⏳ Unlocking in: {remaining} minutes"
+            )
+
+    # UNLOCK
     if lock_active:
+
         for role in guild.roles:
+
             if role.permissions.administrator:
                 continue
 
@@ -144,6 +156,7 @@ async def unlock(ctx):
     guild = ctx.guild
 
     for role in guild.roles:
+
         if role.permissions.administrator:
             continue
 
