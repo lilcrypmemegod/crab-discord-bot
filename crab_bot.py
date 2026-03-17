@@ -40,32 +40,6 @@ def get_mc():
         return "MC unavailable"
 
 
-async def send_random_gif(channel):
-    gif = random.choice(crab_gifs)
-    await channel.send(gif)
-
-
-async def crab_blessing(message):
-
-    if random.randint(1,777) != 1:
-        return
-
-    role_name = "Crab Blessing"
-
-    role = discord.utils.get(message.guild.roles, name=role_name)
-
-    if role is None:
-        role = await message.guild.create_role(name=role_name)
-
-    await message.author.add_roles(role)
-
-    await message.channel.send(
-        f"🔥 THE CRAB GODS HAVE BLESSED {message.author.mention} 🔥"
-    )
-
-    await send_random_gif(message.channel)
-
-
 class CrabButton(discord.ui.View):
 
     def __init__(self):
@@ -76,12 +50,18 @@ class CrabButton(discord.ui.View):
     async def press(self, interaction: discord.Interaction, button: discord.ui.Button):
 
         mc = get_mc()
+        gif = random.choice(crab_gifs)
 
-        await interaction.response.send_message(
-            f"🦀 {interaction.user.display_name} pressed the crab button 🔪\nMC - {mc}"
+        embed = discord.Embed(
+            title="CRAB BUTTON PRESSED",
+            description=f"🦀 **{interaction.user.display_name} pressed the crab button**\n\nMC - {mc}",
+            color=0xff0000
         )
 
-        await send_random_gif(interaction.channel)
+        embed.set_image(url=gif)
+
+        # remove button
+        await interaction.response.edit_message(embed=embed, view=None)
 
 
 @client.event
@@ -95,30 +75,16 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-
-    if message.content == "!crab":
-
-        mc = get_mc()
-
-        await message.channel.send(f"MC - {mc}")
-
-        await send_random_gif(message.channel)
-
-        await crab_blessing(message)
-
-
     if message.content == "!CRAB":
 
         mc = get_mc()
 
-        await message.channel.send(
-            f"MC - {mc}\nDO NOT PRESS THE CRAB BUTTON",
-            view=CrabButton()
+        embed = discord.Embed(
+            description=f"MC - {mc}\n\n**DO NOT PRESS THE CRAB BUTTON**",
+            color=0xff0000
         )
 
-        await send_random_gif(message.channel)
-
-        await crab_blessing(message)
+        await message.channel.send(embed=embed, view=CrabButton())
 
 
 client.run(TOKEN)
