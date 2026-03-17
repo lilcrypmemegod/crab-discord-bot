@@ -12,11 +12,12 @@ client = discord.Client(intents=intents)
 
 PAIR_API = "https://api.dexscreener.com/latest/dex/pairs/cronos/0xdf9030e28cde0f4e6f11c65362c5e152093c7414"
 
+# Reliable crab gifs
 crab_gifs = [
-"https://media.tenor.com/zp7s1q4dY5AAAAAC/crab-dance-crab.gif",
-"https://media.tenor.com/jh3xv6S3y9gAAAAC/crab-knife.gif",
-"https://media.tenor.com/2roX3QqN8w8AAAAC/crab-dance.gif",
-"https://media.tenor.com/T1NnQhYhQ9YAAAAC/crab-rave.gif"
+"https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif",
+"https://media.giphy.com/media/3o7TKsQ8UQ6QWq9G9y/giphy.gif",
+"https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif",
+"https://media.giphy.com/media/xT0xeJpnrWC4XWblEk/giphy.gif"
 ]
 
 
@@ -70,7 +71,7 @@ async def on_message(message):
         return
 
 
-    # !crab command
+    # !crab
     if message.content == "!crab":
 
         mc = get_mc()
@@ -86,7 +87,7 @@ async def on_message(message):
         await message.channel.send(embed=embed)
 
 
-    # !CRAB command
+    # !CRAB
     if message.content == "!CRAB":
 
         mc = get_mc()
