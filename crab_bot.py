@@ -13,12 +13,11 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 MC = "$35.56K"
 
 crab_gifs = [
-"https://media.tenor.com/28m_uG2B0K4AAAAd/crab-with-knife.gif",
-"https://media.tenor.com/bn6wVnH3v6gAAAAd/crab-knife.gif",
-"https://media.tenor.com/ksGxk8KZc4kAAAAd/crab-battle.gif",
-"https://media.tenor.com/2g7uGZ6q9x0AAAAd/crab-fight.gif",
-"https://media.tenor.com/4s8Kk7Y7k8gAAAAd/crab-dance.gif",
-"https://media.tenor.com/LmQ8xk8uJ5AAAAAd/crab-knife-fight.gif"
+"https://tenor.com/view/licking-knife-crabby-crab-pikaole-threatening-menacing-gif-23124736",
+"https://tenor.com/view/fighting-crab-crab-with-a-knife-hes-got-a-knife-dont-touch-me-bro-get-off-gif-18793247",
+"https://tenor.com/view/threat-crabby-stabby-knife-stab-angry-gif-8684191936841762266",
+"https://tenor.com/view/caranguejo-pandlr-man-crab-knife-pandlrg-faca-caranguejo-gif-13381866007168454019",
+"https://tenor.com/view/crab-knife-fight-gif-7305809"
 ]
 
 class CrabButton(discord.ui.View):
@@ -38,7 +37,7 @@ class CrabButton(discord.ui.View):
             color=discord.Color.red()
         )
 
-        gif_embed = discord.Embed(color=discord.Color.red())
+        gif_embed = discord.Embed()
         gif_embed.set_image(url=gif)
 
         await interaction.followup.send(embed=press_embed)
@@ -54,6 +53,22 @@ async def on_ready():
 
 @bot.command()
 async def crab(ctx):
+
+    gif = random.choice(crab_gifs)
+
+    mc_embed = discord.Embed(
+        description=f"MC - {MC}",
+        color=discord.Color.red()
+    )
+
+    gif_embed = discord.Embed()
+    gif_embed.set_image(url=gif)
+
+    await ctx.send(embed=mc_embed)
+    await ctx.send(embed=gif_embed)
+
+@bot.command(name="CRAB")
+async def crab_button(ctx):
 
     embed = discord.Embed(
         description=f"MC - {MC}\n\nDO NOT PRESS THE CRAB BUTTON",
