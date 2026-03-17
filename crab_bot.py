@@ -12,12 +12,13 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 
 MC = "$35.56K"
 
+# Direct Tenor CDN GIF links (these embed correctly)
 crab_gifs = [
-"https://tenor.com/view/licking-knife-crabby-crab-pikaole-threatening-menacing-gif-23124736",
-"https://tenor.com/view/fighting-crab-crab-with-a-knife-hes-got-a-knife-dont-touch-me-bro-get-off-gif-18793247",
-"https://tenor.com/view/threat-crabby-stabby-knife-stab-angry-gif-8684191936841762266",
-"https://tenor.com/view/caranguejo-pandlr-man-crab-knife-pandlrg-faca-caranguejo-gif-13381866007168454019",
-"https://tenor.com/view/crab-knife-fight-gif-7305809"
+"https://media.tenor.com/28m_uG2B0K4AAAAd/crab-with-knife.gif",
+"https://media.tenor.com/X3G8W2WfK1kAAAAd/crab-with-knife-fight.gif",
+"https://media.tenor.com/ksGxk8KZc4kAAAAd/crab-fight.gif",
+"https://media.tenor.com/2g7uGZ6q9x0AAAAd/crab-battle.gif",
+"https://media.tenor.com/bn6wVnH3v6gAAAAd/crab-knife.gif"
 ]
 
 class CrabButton(discord.ui.View):
