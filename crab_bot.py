@@ -12,13 +12,11 @@ intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 crab_gifs = [
-"https://tenor.com/view/licking-knife-crabby-crab-pikaole-threatening-menacing-gif-23124736",
-"https://tenor.com/view/fighting-crab-crab-with-a-knife-hes-got-a-knife-dont-touch-me-bro-get-off-gif-18793247",
-"https://tenor.com/view/threat-crabby-stabby-knife-stab-angry-gif-8684191936841762266",
-"https://tenor.com/view/caranguejo-pandlr-man-crab-knife-pandlrg-faca-caranguejo-gif-13381866007168454019",
-"https://tenor.com/view/crab-knife-fight-gif-7305809"
+"https://media.tenor.com/images/8d9b48c7a07f9dcbfcba1cc403a53d58/tenor.gif",
+"https://media.tenor.com/images/1f21d71f7d23d5d7d64f3f7e5f6e4f3c/tenor.gif",
+"https://media.tenor.com/images/2g7uGZ6q9x0AAAAd/crab-battle.gif",
+"https://media.tenor.com/images/4s8Kk7Y7k8gAAAAd/crab-dance.gif"
 ]
-
 
 class CrabButton(discord.ui.View):
 
@@ -33,78 +31,69 @@ class CrabButton(discord.ui.View):
         await interaction.response.edit_message(view=self)
 
         await interaction.followup.send(
-            f"🚨🦀 **{interaction.user.name} pressed the crab button** 🦀🚨"
+            f"🚨🦀 **CRAB RAID ALERT** 🦀🚨\n"
+            f"@everyone\n"
+            f"**{interaction.user.name} HAS SUMMONED THE CRABS**"
         )
 
         await interaction.followup.send(gif)
 
-        # 1 / 777 blessing
         if random.randint(1,777) == 1:
             await interaction.followup.send(
                 f"🦀 congratulations {interaction.user.mention} you have received the crab blessing the crab gods have blessed you 🦀"
             )
 
-
 @bot.event
 async def on_ready():
     print(f"Crab bot online as {bot.user}")
-
 
 @bot.command()
 async def crab(ctx):
 
     gif = random.choice(crab_gifs)
-
     await ctx.send(gif)
-
 
 @bot.command(name="CRAB")
 async def crab_button(ctx):
 
     embed = discord.Embed(
-        description="**DO NOT PRESS THE CRAB BUTTON**",
+        description="🚨 **DO NOT PRESS THE CRAB BUTTON** 🚨",
         color=discord.Color.red()
     )
 
     await ctx.send(embed=embed, view=CrabButton())
 
-
 @bot.command()
-@commands.has_permissions(manage_channels=True)
+@commands.has_permissions(administrator=True)
 async def lock(ctx, minutes: int):
 
     channel = ctx.channel
 
-    overwrite = channel.overwrites_for(ctx.guild.default_role)
-    overwrite.send_messages = False
-
-    await channel.set_permissions(ctx.guild.default_role, overwrite=overwrite)
+    await channel.edit(slowmode_delay=21600)
 
     gif = random.choice(crab_gifs)
 
-    await ctx.send(f"🔒 Chat locked for {minutes} minutes 🦀")
+    await ctx.send(
+        f"🚨🦀 **CRAB RAID LOCKDOWN** 🦀🚨\n"
+        f"Chat locked by **{ctx.author.name}** for {minutes} minutes"
+    )
+
     await ctx.send(gif)
 
     await asyncio.sleep(minutes * 60)
 
-    overwrite.send_messages = True
-    await channel.set_permissions(ctx.guild.default_role, overwrite=overwrite)
+    await channel.edit(slowmode_delay=0)
 
-    await ctx.send("🔓 Chat unlocked 🦀")
-
+    await ctx.send("🔓 Raid lockdown ended. Chat reopened 🦀")
 
 @bot.command()
-@commands.has_permissions(manage_channels=True)
+@commands.has_permissions(administrator=True)
 async def unlock(ctx):
 
     channel = ctx.channel
 
-    overwrite = channel.overwrites_for(ctx.guild.default_role)
-    overwrite.send_messages = True
+    await channel.edit(slowmode_delay=0)
 
-    await channel.set_permissions(ctx.guild.default_role, overwrite=overwrite)
-
-    await ctx.send("🔓 Chat manually unlocked 🦀")
-
+    await ctx.send("🔓 Admin unlocked the chat 🦀")
 
 bot.run(TOKEN)
