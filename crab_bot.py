@@ -12,38 +12,28 @@ client = discord.Client(intents=intents)
 
 PAIR_API = "https://api.dexscreener.com/latest/dex/pairs/cronos/0xdf9030e28cde0f4e6f11c65362c5e152093c7414"
 
-# EXACT CRAB KNIFE GIFS YOU REQUESTED
+# YOUR CRAB KNIFE GIFS
 crab_gifs = [
 
 "https://media.tenor.com/Au4dF0h5s5kAAAAC/licking-knife-crabby-crab.gif",
-
 "https://media.tenor.com/VXH0m2CqzLQAAAAC/crab-with-a-knife.gif",
-
 "https://media.tenor.com/FqJq3hM6nC8AAAAC/stabby-crab.gif",
-
 "https://media.tenor.com/7O4hC4O5kqAAAAAC/crab-knife-pandlr.gif",
-
 "https://media.tenor.com/6sHqS4b3ZPAAAAAC/crab-knife-fight.gif"
 
 ]
 
 
 def get_mc():
-
     try:
         r = requests.get(PAIR_API, timeout=10)
         data = r.json()
 
         pair = data.get("pair")
-
-        if not pair:
-            return "MC unavailable"
-
         mc = pair.get("marketCap") or pair.get("fdv")
 
         if mc >= 1_000_000:
             return f"${round(mc/1_000_000,2)}M"
-
         if mc >= 1_000:
             return f"${round(mc/1_000,2)}K"
 
@@ -53,11 +43,19 @@ def get_mc():
         return "MC unavailable"
 
 
+async def send_random_crab(channel):
+
+    gif = random.choice(crab_gifs)
+
+    embed = discord.Embed(color=0xff0000)
+    embed.set_image(url=gif)
+
+    await channel.send(embed=embed)
+
+
 async def crab_blessing(message):
 
-    roll = random.randint(1,777)
-
-    if roll != 1:
+    if random.randint(1,777) != 1:
         return
 
     role_name = "Crab Blessing"
@@ -73,8 +71,7 @@ async def crab_blessing(message):
         f"🔥 **THE CRAB GODS HAVE BLESSED {message.author.mention}** 🔥"
     )
 
-    for gif in crab_gifs:
-        await message.channel.send(gif)
+    await send_random_crab(message.channel)
 
 
 class CrabButton(discord.ui.View):
@@ -92,8 +89,7 @@ class CrabButton(discord.ui.View):
             f"🦀 **{interaction.user.display_name} pressed the crab button 🔪**\nMC - {mc}"
         )
 
-        for gif in crab_gifs:
-            await interaction.channel.send(gif)
+        await send_random_crab(interaction.channel)
 
 
 @client.event
@@ -114,8 +110,7 @@ async def on_message(message):
 
         await message.channel.send(f"MC - {mc}")
 
-        for gif in crab_gifs:
-            await message.channel.send(gif)
+        await send_random_crab(message.channel)
 
         await crab_blessing(message)
 
@@ -129,8 +124,7 @@ async def on_message(message):
             view=CrabButton()
         )
 
-        for gif in crab_gifs:
-            await message.channel.send(gif)
+        await send_random_crab(message.channel)
 
         await crab_blessing(message)
 
