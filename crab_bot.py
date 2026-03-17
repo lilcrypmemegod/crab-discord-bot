@@ -13,11 +13,11 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 MC = "$35.56K"
 
 crab_gifs = [
-"https://media.tenor.com/28m_uG2B0K4AAAAd/crab-with-knife.gif",
-"https://media.tenor.com/ksGxk8KZc4kAAAAd/crab-fight.gif",
-"https://media.tenor.com/2g7uGZ6q9x0AAAAd/crab-battle.gif",
-"https://media.tenor.com/X3G8W2WfK1kAAAAd/crab-knife-fight.gif",
-"https://media.tenor.com/bn6wVnH3v6gAAAAd/crab-knife.gif"
+"https://media.tenor.com/8gZ5vH1K6VMAAAAd/licking-knife-crabby.gif",
+"https://media.tenor.com/bx5b3hR9Y2EAAAAd/crab-with-a-knife.gif",
+"https://media.tenor.com/Fp7E9n4s2FMAAAAd/crab-stabby.gif",
+"https://media.tenor.com/fxL2X4S6zM0AAAAd/man-crab-knife.gif",
+"https://media.tenor.com/7M4F2mP0k6YAAAAd/crab-knife-fight.gif"
 ]
 
 class CrabButton(discord.ui.View):
@@ -36,11 +36,14 @@ class CrabButton(discord.ui.View):
             f"🚨🦀 **{interaction.user.name} pressed the crab button** 🦀🚨\nMC - {MC}"
         )
 
-        await interaction.followup.send(gif)
+        embed = discord.Embed()
+        embed.set_image(url=gif)
+
+        await interaction.followup.send(embed=embed)
 
         if random.randint(1,777) == 1:
             await interaction.followup.send(
-                f"🦀✨ CRAB GOD EVENT ✨🦀\n\ncongratulations {interaction.user.mention} you have received the crab blessing the crab gods have blessed you 🦀"
+                f"🦀 congratulations {interaction.user.mention} you have received the crab blessing the crab gods have blessed you 🦀"
             )
 
 @bot.event
@@ -53,7 +56,11 @@ async def crab(ctx):
     gif = random.choice(crab_gifs)
 
     await ctx.send(f"MC - {MC}")
-    await ctx.send(gif)
+
+    embed = discord.Embed()
+    embed.set_image(url=gif)
+
+    await ctx.send(embed=embed)
 
 @bot.command(name="CRAB")
 async def crab_button(ctx):
