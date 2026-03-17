@@ -11,7 +11,7 @@ intents.message_content = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-# YOUR ORIGINAL CRAB GIFS
+# YOUR ORIGINAL KNIFE CRAB GIFS
 crab_gifs = [
 "https://tenor.com/view/licking-knife-crabby-crab-pikaole-threatening-menacing-gif-23124736",
 "https://tenor.com/view/fighting-crab-crab-with-a-knife-hes-got-a-knife-dont-touch-me-bro-get-off-gif-18793247",
@@ -22,6 +22,9 @@ crab_gifs = [
 
 
 class CrabButton(discord.ui.View):
+
+    def __init__(self):
+        super().__init__(timeout=None)
 
     @discord.ui.button(label="CRAB", style=discord.ButtonStyle.danger)
     async def crab(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -34,7 +37,7 @@ class CrabButton(discord.ui.View):
         await interaction.response.edit_message(view=self)
 
         await interaction.followup.send(
-            f"🦀 {interaction.user.name} pressed the crab button 🦀"
+            f"🦀 {interaction.user.mention} pressed the crab button 🦀"
         )
 
         await interaction.followup.send(gif)
@@ -50,7 +53,7 @@ async def on_ready():
     print(f"Crab bot online as {bot.user}")
 
 
-# !crab command
+# POST RANDOM CRAB GIF
 @bot.command()
 async def crab(ctx):
 
@@ -61,14 +64,14 @@ async def crab(ctx):
     await ctx.send(gif)
 
 
-# !CRAB button
+# SPAWN CRAB BUTTON
 @bot.command(name="CRAB")
 async def crab_button(ctx):
 
     await ctx.message.delete()
 
     embed = discord.Embed(
-        description="🚨 DO NOT PRESS THE CRAB BUTTON 🚨",
+        description=f"🚨 DO NOT PRESS THE CRAB BUTTON 🚨\n\nsummoned by {ctx.author.mention}",
         color=discord.Color.red()
     )
 
@@ -90,36 +93,16 @@ async def lock(ctx, minutes: int):
 
     await channel.set_permissions(guild.default_role, overwrite=overwrite)
 
-    gif = random.choice(crab_gifs)
-
     await ctx.send("🚨🦀 CRAB RAID LOCKDOWN 🦀🚨\n🔒 Chat locked")
+
+    gif = random.choice(crab_gifs)
 
     await ctx.send(gif)
 
     await asyncio.sleep(minutes * 60)
 
-    overwrite.send_messages = True
+    overwrite.send_messages = None
     await channel.set_permissions(guild.default_role, overwrite=overwrite)
-
-    await ctx.send("🔓 Chat unlocked 🦀")
-
-
-# UNLOCK
-@bot.command()
-@commands.has_permissions(administrator=True)
-async def unlock(ctx):
-
-    await ctx.message.delete()
-
-    channel = ctx.channel
-    guild = ctx.guild
-
-    overwrite = channel.overwrites_for(guild.default_role)
-    overwrite.send_messages = True
-
-    await channel.set_permissions(guild.default_role, overwrite=overwrite)
-
-    await ctx.send("🔓 Chat unlocked 🦀")
 
 
 bot.run(TOKEN)
