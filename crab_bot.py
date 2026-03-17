@@ -14,7 +14,6 @@ client = discord.Client(intents=intents)
 
 PAIR_API = "https://api.dexscreener.com/latest/dex/pairs/cronos/0xdf9030e28cde0f4e6f11c65362c5e152093c7414"
 
-# EXACT GIFS YOU PROVIDED
 crab_gifs = [
 "https://media.tenor.com/3QkS2J8YB5AAAAAC/crabby-crab-pikaole.gif",
 "https://media.tenor.com/7K6sR2u9N0AAAAAC/crab-with-a-knife.gif",
@@ -25,25 +24,41 @@ crab_gifs = [
 
 
 def get_mc():
-    r = requests.get(PAIR_API)
-    data = r.json()
 
-    pair = data["pair"]
-    mc = pair.get("marketCap") or pair.get("fdv")
+    try:
+        r = requests.get(PAIR_API, timeout=10)
+        data = r.json()
 
-    if mc >= 1_000_000:
-        return f"${round(mc/1_000_000,2)}M"
-    elif mc >= 1_000:
-        return f"${round(mc/1_000,2)}K"
-    else:
+        pair = data.get("pair")
+
+        if not pair:
+            return "MC unavailable"
+
+        mc = pair.get("marketCap") or pair.get("fdv")
+
+        if not mc:
+            return "MC unavailable"
+
+        if mc >= 1_000_000:
+            return f"${round(mc/1_000_000,2)}M"
+
+        if mc >= 1_000:
+            return f"${round(mc/1_000,2)}K"
+
         return f"${mc}"
+
+    except:
+        return "MC unavailable"
 
 
 async def crab_blessing(message):
 
-    roll = random.randint(1,777)
+    try:
 
-    if roll == 1:
+        roll = random.randint(1,777)
+
+        if roll != 1:
+            return
 
         guild = message.guild
         role_name = "Crab Blessing"
@@ -64,6 +79,9 @@ async def crab_blessing(message):
 
         await message.channel.send(embed=embed)
 
+    except:
+        pass
+
 
 class CrabButton(discord.ui.View):
 
@@ -71,19 +89,25 @@ class CrabButton(discord.ui.View):
         super().__init__(timeout=None)
 
     @discord.ui.button(label="CRAB", style=discord.ButtonStyle.danger)
+
     async def press(self, interaction: discord.Interaction, button: discord.ui.Button):
 
-        mc = get_mc()
-        gif = random.choice(crab_gifs)
+        try:
 
-        embed = discord.Embed(
-            description=f"🦀 **{interaction.user.display_name} pressed the crab button 🔪**\n\nMC - {mc}",
-            color=0xff0000
-        )
+            mc = get_mc()
+            gif = random.choice(crab_gifs)
 
-        embed.set_image(url=gif)
+            embed = discord.Embed(
+                description=f"🦀 **{interaction.user.display_name} pressed the crab button 🔪**\n\nMC - {mc}",
+                color=0xff0000
+            )
 
-        await interaction.response.send_message(embed=embed)
+            embed.set_image(url=gif)
+
+            await interaction.response.send_message(embed=embed)
+
+        except:
+            await interaction.response.send_message("Crab malfunction 🦀", ephemeral=True)
 
 
 @client.event
@@ -97,41 +121,43 @@ async def on_message(message):
     if message.author == client.user:
         return
 
+    try:
 
-    # !crab
-    if message.content == "!crab":
+        if message.content == "!crab":
 
-        mc = get_mc()
-        gif = random.choice(crab_gifs)
+            mc = get_mc()
+            gif = random.choice(crab_gifs)
 
-        embed = discord.Embed(
-            description=f"MC - {mc}",
-            color=0xff0000
-        )
+            embed = discord.Embed(
+                description=f"MC - {mc}",
+                color=0xff0000
+            )
 
-        embed.set_image(url=gif)
+            embed.set_image(url=gif)
 
-        await message.channel.send(embed=embed)
+            await message.channel.send(embed=embed)
 
-        await crab_blessing(message)
+            await crab_blessing(message)
 
 
-    # !CRAB
-    if message.content == "!CRAB":
+        if message.content == "!CRAB":
 
-        mc = get_mc()
-        gif = random.choice(crab_gifs)
+            mc = get_mc()
+            gif = random.choice(crab_gifs)
 
-        embed = discord.Embed(
-            description=f"MC - {mc}\nDO NOT PRESS THE CRAB BUTTON",
-            color=0xff0000
-        )
+            embed = discord.Embed(
+                description=f"MC - {mc}\nDO NOT PRESS THE CRAB BUTTON",
+                color=0xff0000
+            )
 
-        embed.set_image(url=gif)
+            embed.set_image(url=gif)
 
-        await message.channel.send(embed=embed, view=CrabButton())
+            await message.channel.send(embed=embed, view=CrabButton())
 
-        await crab_blessing(message)
+            await crab_blessing(message)
+
+    except:
+        pass
 
 
 client.run(TOKEN)
