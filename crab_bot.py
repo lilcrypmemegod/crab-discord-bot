@@ -14,13 +14,13 @@ client = discord.Client(intents=intents)
 
 PAIR_API = "https://api.dexscreener.com/latest/dex/pairs/cronos/0xdf9030e28cde0f4e6f11c65362c5e152093c7414"
 
-# YOUR EXACT GIFS
+# EXACT GIFS YOU PROVIDED
 crab_gifs = [
-"https://media.tenor.com/0P4O7g6H5sEAAAAC/crabby-crab-pikaole.gif",
-"https://media.tenor.com/6N0tXbqS6cAAAAAC/crab-with-a-knife.gif",
-"https://media.tenor.com/Q6O4KxSsz0AAAAAC/angry-crab-knife.gif",
-"https://media.tenor.com/6y7RDr7guX4AAAAC/crab-knife-pandlr.gif",
-"https://media.tenor.com/Wm6dG4Wq3j4AAAAC/crab-knife.gif"
+"https://media.tenor.com/3QkS2J8YB5AAAAAC/crabby-crab-pikaole.gif",
+"https://media.tenor.com/7K6sR2u9N0AAAAAC/crab-with-a-knife.gif",
+"https://media.tenor.com/hWc3J8JxCj0AAAAC/threat-crabby-stabby.gif",
+"https://media.tenor.com/lXkZJp2R0KcAAAAC/caraguejo-pandlr.gif",
+"https://media.tenor.com/JV5R4J2NQ2kAAAAC/crab-knife-fight.gif"
 ]
 
 
@@ -45,8 +45,9 @@ async def crab_blessing(message):
 
     if roll == 1:
 
-        role_name = "Crab Blessing"
         guild = message.guild
+        role_name = "Crab Blessing"
+
         role = discord.utils.get(guild.roles, name=role_name)
 
         if role is None:
@@ -58,6 +59,8 @@ async def crab_blessing(message):
             description=f"🦀 **THE CRAB GODS HAVE SPOKEN**\n\n{message.author.mention} has received the **CRAB BLESSING**",
             color=0xff0000
         )
+
+        embed.set_image(url=random.choice(crab_gifs))
 
         await message.channel.send(embed=embed)
 
