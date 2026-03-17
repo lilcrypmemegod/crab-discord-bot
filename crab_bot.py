@@ -10,8 +10,7 @@ intents.message_content = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-# Replace this with your crab with knife pair address
-PAIR_API = "https://api.dexscreener.com/latest/dex/pairs/cronos/PAIR_ADDRESS_HERE"
+PAIR_API = "https://api.dexscreener.com/latest/dex/pairs/cronos/0xdf9030e28cde0f4e6f11c65362c5e152093c7414"
 
 @bot.event
 async def on_ready():
@@ -23,7 +22,9 @@ async def crab(ctx):
         r = requests.get(PAIR_API)
         data = r.json()
 
-        mc = data["pair"]["marketCap"]
+        pair = data["pair"]
+
+        mc = pair.get("marketCap") or pair.get("fdv")
 
         if mc >= 1_000_000:
             mc_text = f"${round(mc/1_000_000,2)}M"
@@ -35,6 +36,7 @@ async def crab(ctx):
         await ctx.send(f"MC - {mc_text}")
 
     except Exception as e:
+        print(e)
         await ctx.send("MC unavailable 🦀")
 
 bot.run(TOKEN)
