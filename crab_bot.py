@@ -7,22 +7,24 @@ TOKEN = os.getenv("TOKEN")
 
 intents = discord.Intents.default()
 intents.message_content = True
+intents.guilds = True
+intents.members = True
 
 client = discord.Client(intents=intents)
 
 PAIR_API = "https://api.dexscreener.com/latest/dex/pairs/cronos/0xdf9030e28cde0f4e6f11c65362c5e152093c7414"
 
-# Reliable crab gifs
+# YOUR EXACT GIFS
 crab_gifs = [
-"https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif",
-"https://media.giphy.com/media/3o7TKsQ8UQ6QWq9G9y/giphy.gif",
-"https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif",
-"https://media.giphy.com/media/xT0xeJpnrWC4XWblEk/giphy.gif"
+"https://media.tenor.com/0P4O7g6H5sEAAAAC/crabby-crab-pikaole.gif",
+"https://media.tenor.com/6N0tXbqS6cAAAAAC/crab-with-a-knife.gif",
+"https://media.tenor.com/Q6O4KxSsz0AAAAAC/angry-crab-knife.gif",
+"https://media.tenor.com/6y7RDr7guX4AAAAC/crab-knife-pandlr.gif",
+"https://media.tenor.com/Wm6dG4Wq3j4AAAAC/crab-knife.gif"
 ]
 
 
 def get_mc():
-
     r = requests.get(PAIR_API)
     data = r.json()
 
@@ -37,20 +39,42 @@ def get_mc():
         return f"${mc}"
 
 
+async def crab_blessing(message):
+
+    roll = random.randint(1,777)
+
+    if roll == 1:
+
+        role_name = "Crab Blessing"
+        guild = message.guild
+        role = discord.utils.get(guild.roles, name=role_name)
+
+        if role is None:
+            role = await guild.create_role(name=role_name)
+
+        await message.author.add_roles(role)
+
+        embed = discord.Embed(
+            description=f"🦀 **THE CRAB GODS HAVE SPOKEN**\n\n{message.author.mention} has received the **CRAB BLESSING**",
+            color=0xff0000
+        )
+
+        await message.channel.send(embed=embed)
+
+
 class CrabButton(discord.ui.View):
 
     def __init__(self):
         super().__init__(timeout=None)
 
     @discord.ui.button(label="CRAB", style=discord.ButtonStyle.danger)
-    async def crab_press(self, interaction: discord.Interaction, button: discord.ui.Button):
+    async def press(self, interaction: discord.Interaction, button: discord.ui.Button):
 
         mc = get_mc()
         gif = random.choice(crab_gifs)
-        user = interaction.user.display_name
 
         embed = discord.Embed(
-            description=f"🦀 **{user} pressed the crab button 🔪**\n\nMC - {mc}",
+            description=f"🦀 **{interaction.user.display_name} pressed the crab button 🔪**\n\nMC - {mc}",
             color=0xff0000
         )
 
@@ -61,7 +85,7 @@ class CrabButton(discord.ui.View):
 
 @client.event
 async def on_ready():
-    print(f"Crab bot ready as {client.user}")
+    print(f"Crab bot running as {client.user}")
 
 
 @client.event
@@ -86,6 +110,8 @@ async def on_message(message):
 
         await message.channel.send(embed=embed)
 
+        await crab_blessing(message)
+
 
     # !CRAB
     if message.content == "!CRAB":
@@ -101,6 +127,8 @@ async def on_message(message):
         embed.set_image(url=gif)
 
         await message.channel.send(embed=embed, view=CrabButton())
+
+        await crab_blessing(message)
 
 
 client.run(TOKEN)
