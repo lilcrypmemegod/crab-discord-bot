@@ -11,6 +11,7 @@ intents.message_content = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
+# knife crab gifs (embed properly)
 crab_gifs = [
 "https://media.tenor.com/8d9b48c7a07f9dcbfcba1cc403a53d58/tenor.gif",
 "https://media.tenor.com/1f21d71f7d23d5d7d64f3f7e5f6e4f3c/tenor.gif",
@@ -18,6 +19,7 @@ crab_gifs = [
 "https://media.tenor.com/4s8Kk7Y7k8gAAAAd/crab-dance.gif",
 "https://media.tenor.com/6Z3YvE8PpJQAAAAd/crab-knife.gif"
 ]
+
 
 class CrabButton(discord.ui.View):
 
@@ -32,7 +34,7 @@ class CrabButton(discord.ui.View):
         await interaction.response.edit_message(view=self)
 
         await interaction.followup.send(
-            "🦀 **THE CRABS HAVE BEEN SUMMONED** 🦀"
+            f"🦀 {interaction.user.name} pressed the crab button 🦀"
         )
 
         embed = discord.Embed(color=discord.Color.red())
@@ -45,11 +47,13 @@ class CrabButton(discord.ui.View):
                 f"🦀 congratulations {interaction.user.mention} you have received the crab blessing 🦀"
             )
 
+
 @bot.event
 async def on_ready():
     print(f"Crab bot online as {bot.user}")
 
-# crab gif
+
+# crab gif command
 @bot.command()
 async def crab(ctx):
 
@@ -62,20 +66,22 @@ async def crab(ctx):
 
     await ctx.send(embed=embed)
 
-# crab button
+
+# crab button command
 @bot.command(name="CRAB")
 async def crab_button(ctx):
 
     await ctx.message.delete()
 
     embed = discord.Embed(
-        description="🚨 **DO NOT PRESS THE CRAB BUTTON** 🚨",
+        description="🚨 DO NOT PRESS THE CRAB BUTTON 🚨",
         color=discord.Color.red()
     )
 
     await ctx.send(embed=embed, view=CrabButton())
 
-# RAID LOCK (admin only)
+
+# RAID LOCK
 @bot.command()
 @commands.has_permissions(administrator=True)
 async def lock(ctx, minutes: int):
@@ -92,7 +98,7 @@ async def lock(ctx, minutes: int):
 
     gif = random.choice(crab_gifs)
 
-    await ctx.send("🚨🦀 **CRAB RAID LOCKDOWN** 🦀🚨\n🔒 Chat locked")
+    await ctx.send("🚨🦀 CRAB RAID LOCKDOWN 🦀🚨\n🔒 Chat locked")
 
     embed = discord.Embed(color=discord.Color.red())
     embed.set_image(url=gif)
@@ -106,7 +112,8 @@ async def lock(ctx, minutes: int):
 
     await ctx.send("🔓 Chat unlocked 🦀")
 
-# unlock
+
+# UNLOCK COMMAND
 @bot.command()
 @commands.has_permissions(administrator=True)
 async def unlock(ctx):
@@ -122,5 +129,6 @@ async def unlock(ctx):
     await channel.set_permissions(guild.default_role, overwrite=overwrite)
 
     await ctx.send("🔓 Chat unlocked 🦀")
+
 
 bot.run(TOKEN)
