@@ -88,27 +88,31 @@ async def lock(ctx, minutes: int, raid_link: str):
     channel = ctx.channel
     guild = ctx.guild
 
-    # LOCK CHAT
-    for role in guild.roles:
-
-        if role.permissions.administrator:
-            continue
-
-        overwrite = channel.overwrites_for(role)
-        overwrite.send_messages = False
-        await channel.set_permissions(role, overwrite=overwrite)
-
     gif = random.choice(crab_gifs)
 
+    # RAID ALERT MESSAGE FIRST (FAST)
     raid_message = await ctx.send(
+        f"🚨🦀 **RAID ALERT** 🦀🚨\n"
+        f"@everyone\n\n"
+        f"⚔️ RAID HERE ⚔️\n{raid_link}\n\n"
+        f"🔒 Chat locking..."
+    )
+
+    await ctx.send(gif)
+
+    # LOCK CHAT FAST
+    overwrite = channel.overwrites_for(guild.default_role)
+    overwrite.send_messages = False
+    await channel.set_permissions(guild.default_role, overwrite=overwrite)
+
+    await raid_message.edit(
+        content=
         f"🚨🦀 **RAID ALERT** 🦀🚨\n"
         f"@everyone\n\n"
         f"⚔️ RAID HERE ⚔️\n{raid_link}\n\n"
         f"🔒 Chat locked\n"
         f"⏳ Unlocking in: {minutes} minutes"
     )
-
-    await ctx.send(gif)
 
     remaining = minutes
 
@@ -128,17 +132,11 @@ async def lock(ctx, minutes: int, raid_link: str):
                 f"⏳ Unlocking in: {remaining} minutes"
             )
 
-    # UNLOCK
     if lock_active:
 
-        for role in guild.roles:
-
-            if role.permissions.administrator:
-                continue
-
-            overwrite = channel.overwrites_for(role)
-            overwrite.send_messages = None
-            await channel.set_permissions(role, overwrite=overwrite)
+        overwrite = channel.overwrites_for(guild.default_role)
+        overwrite.send_messages = None
+        await channel.set_permissions(guild.default_role, overwrite=overwrite)
 
     lock_active = False
 
@@ -155,14 +153,9 @@ async def unlock(ctx):
     channel = ctx.channel
     guild = ctx.guild
 
-    for role in guild.roles:
-
-        if role.permissions.administrator:
-            continue
-
-        overwrite = channel.overwrites_for(role)
-        overwrite.send_messages = None
-        await channel.set_permissions(role, overwrite=overwrite)
+    overwrite = channel.overwrites_for(guild.default_role)
+    overwrite.send_messages = None
+    await channel.set_permissions(guild.default_role, overwrite=overwrite)
 
 
 bot.run(TOKEN)
