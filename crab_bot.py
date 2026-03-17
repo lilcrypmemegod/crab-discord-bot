@@ -12,12 +12,11 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 
 MC = "$35.56K"
 
-# Direct Tenor CDN GIF links (these embed correctly)
 crab_gifs = [
 "https://media.tenor.com/28m_uG2B0K4AAAAd/crab-with-knife.gif",
-"https://media.tenor.com/X3G8W2WfK1kAAAAd/crab-with-knife-fight.gif",
 "https://media.tenor.com/ksGxk8KZc4kAAAAd/crab-fight.gif",
 "https://media.tenor.com/2g7uGZ6q9x0AAAAd/crab-battle.gif",
+"https://media.tenor.com/X3G8W2WfK1kAAAAd/crab-knife-fight.gif",
 "https://media.tenor.com/bn6wVnH3v6gAAAAd/crab-knife.gif"
 ]
 
@@ -33,20 +32,16 @@ class CrabButton(discord.ui.View):
 
         await interaction.response.edit_message(view=self)
 
-        press_embed = discord.Embed(
-            description=f"🚨🦀 {interaction.user.name} pressed the crab button 🦀🚨\n\nMC - {MC}",
-            color=discord.Color.red()
-        )
-
-        gif_embed = discord.Embed()
-        gif_embed.set_image(url=gif)
-
-        await interaction.followup.send(embed=press_embed)
-        await interaction.followup.send(embed=gif_embed)
-
         await interaction.followup.send(
-            f"🦀 congratulations {interaction.user.mention} you have received the crab blessing the crab gods have blessed you 🦀"
+            f"🚨🦀 **{interaction.user.name} pressed the crab button** 🦀🚨\nMC - {MC}"
         )
+
+        await interaction.followup.send(gif)
+
+        if random.randint(1,777) == 1:
+            await interaction.followup.send(
+                f"🦀✨ CRAB GOD EVENT ✨🦀\n\ncongratulations {interaction.user.mention} you have received the crab blessing the crab gods have blessed you 🦀"
+            )
 
 @bot.event
 async def on_ready():
@@ -57,23 +52,15 @@ async def crab(ctx):
 
     gif = random.choice(crab_gifs)
 
-    mc_embed = discord.Embed(
-        description=f"MC - {MC}",
-        color=discord.Color.red()
-    )
-
-    gif_embed = discord.Embed()
-    gif_embed.set_image(url=gif)
-
-    await ctx.send(embed=mc_embed)
-    await ctx.send(embed=gif_embed)
+    await ctx.send(f"MC - {MC}")
+    await ctx.send(gif)
 
 @bot.command(name="CRAB")
 async def crab_button(ctx):
 
     embed = discord.Embed(
-        description=f"MC - {MC}\n\nDO NOT PRESS THE CRAB BUTTON",
-        color=discord.Color.dark_red()
+        description=f"MC - {MC}\n\n**DO NOT PRESS THE CRAB BUTTON**",
+        color=discord.Color.red()
     )
 
     await ctx.send(embed=embed, view=CrabButton())
