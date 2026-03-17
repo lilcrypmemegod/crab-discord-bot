@@ -13,13 +13,15 @@ client = discord.Client(intents=intents)
 PAIR_API = "https://api.dexscreener.com/latest/dex/pairs/cronos/0xdf9030e28cde0f4e6f11c65362c5e152093c7414"
 
 crab_gifs = [
-"https://media.tenor.com/Z6gmDPeM6dgAAAAC/crab-dance.gif",
-"https://media.tenor.com/W5gq7HnYx6QAAAAC/crab-rave.gif",
-"https://media.tenor.com/f8dZ8iKz9hAAAAAC/crab-dance-party.gif"
+"https://media.tenor.com/zp7s1q4dY5AAAAAC/crab-dance-crab.gif",
+"https://media.tenor.com/jh3xv6S3y9gAAAAC/crab-knife.gif",
+"https://media.tenor.com/2roX3QqN8w8AAAAC/crab-dance.gif",
+"https://media.tenor.com/T1NnQhYhQ9YAAAAC/crab-rave.gif"
 ]
 
 
 def get_mc():
+
     r = requests.get(PAIR_API)
     data = r.json()
 
@@ -36,14 +38,18 @@ def get_mc():
 
 class CrabButton(discord.ui.View):
 
+    def __init__(self):
+        super().__init__(timeout=None)
+
     @discord.ui.button(label="CRAB", style=discord.ButtonStyle.danger)
-    async def press(self, interaction: discord.Interaction, button: discord.ui.Button):
+    async def crab_press(self, interaction: discord.Interaction, button: discord.ui.Button):
 
         mc = get_mc()
         gif = random.choice(crab_gifs)
+        user = interaction.user.display_name
 
         embed = discord.Embed(
-            description=f"🦀 SOMEONE PRESSED THE CRAB BUTTON 🔪\n\nMC - {mc}",
+            description=f"🦀 **{user} pressed the crab button 🔪**\n\nMC - {mc}",
             color=0xff0000
         )
 
@@ -54,7 +60,7 @@ class CrabButton(discord.ui.View):
 
 @client.event
 async def on_ready():
-    print("Crab bot ready")
+    print(f"Crab bot ready as {client.user}")
 
 
 @client.event
@@ -62,6 +68,7 @@ async def on_message(message):
 
     if message.author == client.user:
         return
+
 
     # !crab command
     if message.content == "!crab":
@@ -77,6 +84,7 @@ async def on_message(message):
         embed.set_image(url=gif)
 
         await message.channel.send(embed=embed)
+
 
     # !CRAB command
     if message.content == "!CRAB":
