@@ -18,18 +18,12 @@ crab_gifs = [
 "https://tenor.com/view/crab-knife-fight-gif-7305809"
 ]
 
-async def get_mc(channel):
-    async for msg in channel.history(limit=20):
-        if "MC -" in msg.content:
-            return msg.content
-    return "MC - Unknown"
-
 class CrabButton(discord.ui.View):
 
     @discord.ui.button(label="CRAB", style=discord.ButtonStyle.danger)
     async def crab(self, interaction: discord.Interaction, button: discord.ui.Button):
 
-        mc = await get_mc(interaction.channel)
+        gif = random.choice(crab_gifs)
 
         button.disabled = True
         button.label = "CRABBED"
@@ -37,10 +31,8 @@ class CrabButton(discord.ui.View):
         await interaction.response.edit_message(view=self)
 
         await interaction.followup.send(
-            f"🚨🦀 **{interaction.user.name} pressed the crab button** 🦀🚨\n{mc}"
+            f"🚨🦀 **{interaction.user.name} pressed the crab button** 🦀🚨"
         )
-
-        gif = random.choice(crab_gifs)
 
         await interaction.followup.send(gif)
 
@@ -56,20 +48,15 @@ async def on_ready():
 @bot.command()
 async def crab(ctx):
 
-    mc = await get_mc(ctx.channel)
-
     gif = random.choice(crab_gifs)
 
-    await ctx.send(mc)
     await ctx.send(gif)
 
 @bot.command(name="CRAB")
 async def crab_button(ctx):
 
-    mc = await get_mc(ctx.channel)
-
     embed = discord.Embed(
-        description=f"{mc}\n\n**DO NOT PRESS THE CRAB BUTTON**",
+        description="**DO NOT PRESS THE CRAB BUTTON**",
         color=discord.Color.red()
     )
 
