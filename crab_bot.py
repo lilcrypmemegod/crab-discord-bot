@@ -38,6 +38,7 @@ class CrabButton(discord.ui.View):
 
         await interaction.followup.send(gif)
 
+        # 1 / 777 blessing
         if random.randint(1,777) == 1:
             await interaction.followup.send(
                 f"🦀 congratulations {interaction.user.mention} you have received the crab blessing the crab gods have blessed you 🦀"
@@ -90,6 +91,20 @@ async def lock(ctx, minutes: int):
     await channel.set_permissions(ctx.guild.default_role, overwrite=overwrite)
 
     await ctx.send("🔓 Chat unlocked 🦀")
+
+
+@bot.command()
+@commands.has_permissions(manage_channels=True)
+async def unlock(ctx):
+
+    channel = ctx.channel
+
+    overwrite = channel.overwrites_for(ctx.guild.default_role)
+    overwrite.send_messages = True
+
+    await channel.set_permissions(ctx.guild.default_role, overwrite=overwrite)
+
+    await ctx.send("🔓 Chat manually unlocked 🦀")
 
 
 bot.run(TOKEN)
