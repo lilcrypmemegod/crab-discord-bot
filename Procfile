@@ -1,0 +1,1 @@
+worker: python crab_bot.py
