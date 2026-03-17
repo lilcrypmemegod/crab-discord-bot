@@ -56,12 +56,10 @@ async def crab_blessing(ctx):
 
     await ctx.author.add_roles(role)
 
-    username = ctx.author.display_name
-
     await ctx.send(
-        f"🦀 **Congratulations {username}!**\n"
+        f"🚨🦀 **CONGRATULATIONS {ctx.author.mention}!** 🚨🦀\n"
         f"You have received the **crab blessing**.\n"
-        f"The crab gods have blessed you. 🦀"
+        f"The crab gods have blessed you."
     )
 
     await ctx.send(random.choice(crab_gifs))
@@ -77,7 +75,7 @@ class CrabButton(discord.ui.View):
         gif = random.choice(crab_gifs)
 
         await interaction.response.edit_message(
-            content=f"🦀 **{interaction.user.display_name} pressed the crab button**\n\nMC - {mc}",
+            content=f"🚨🦀 {interaction.user.mention} **PRESSED THE CRAB BUTTON** 🚨🦀\n\nMC - {mc}",
             view=None
         )
 
