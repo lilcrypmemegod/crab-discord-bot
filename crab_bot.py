@@ -10,10 +10,8 @@ intents.message_content = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-# MARKET CAP
 MC = "$35.56K"
 
-# GIF LIST (direct GIF links)
 crab_gifs = [
 "https://media.tenor.com/28m_uG2B0K4AAAAd/crab-with-knife.gif",
 "https://media.tenor.com/bn6wVnH3v6gAAAAd/crab-knife.gif",
@@ -30,21 +28,22 @@ class CrabButton(discord.ui.View):
 
         gif = random.choice(crab_gifs)
 
-        embed = discord.Embed(
-            description=f"🚨🦀 **{interaction.user.name} pressed the crab button** 🦀🚨\n\nMC - {MC}",
-            color=discord.Color.red()
-        )
-
-        # remove button after press
         button.disabled = True
         button.label = "CRABBED"
 
         await interaction.response.edit_message(view=self)
 
-        await interaction.followup.send(embed=embed)
-        await interaction.followup.send(gif)
+        press_embed = discord.Embed(
+            description=f"🚨🦀 {interaction.user.name} pressed the crab button 🦀🚨\n\nMC - {MC}",
+            color=discord.Color.red()
+        )
 
-        # crab blessing
+        gif_embed = discord.Embed(color=discord.Color.red())
+        gif_embed.set_image(url=gif)
+
+        await interaction.followup.send(embed=press_embed)
+        await interaction.followup.send(embed=gif_embed)
+
         await interaction.followup.send(
             f"🦀 congratulations {interaction.user.mention} you have received the crab blessing the crab gods have blessed you 🦀"
         )
@@ -57,7 +56,7 @@ async def on_ready():
 async def crab(ctx):
 
     embed = discord.Embed(
-        description=f"MC - {MC}\n\n**DO NOT PRESS THE CRAB BUTTON**",
+        description=f"MC - {MC}\n\nDO NOT PRESS THE CRAB BUTTON",
         color=discord.Color.dark_red()
     )
 
