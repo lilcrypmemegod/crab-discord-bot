@@ -14,17 +14,19 @@ client = discord.Client(intents=intents)
 
 PAIR_API = "https://api.dexscreener.com/latest/dex/pairs/cronos/0xdf9030e28cde0f4e6f11c65362c5e152093c7414"
 
+# YOUR EXACT GIFS
 crab_gifs = [
-"https://media.tenor.com/3QkS2J8YB5AAAAAC/crabby-crab-pikaole.gif",
-"https://media.tenor.com/7K6sR2u9N0AAAAAC/crab-with-a-knife.gif",
-"https://media.tenor.com/hWc3J8JxCj0AAAAC/threat-crabby-stabby.gif",
-"https://media.tenor.com/lXkZJp2R0KcAAAAC/caraguejo-pandlr.gif",
-"https://media.tenor.com/JV5R4J2NQ2kAAAAC/crab-knife-fight.gif"
+
+"https://tenor.com/view/licking-knife-crabby-crab-pikaole-threatening-menacing-gif-23124736",
+"https://tenor.com/view/fighting-crab-crab-with-a-knife-hes-got-a-knife-dont-touch-me-bro-get-off-gif-18793247",
+"https://tenor.com/view/threat-crabby-stabby-knife-stab-angry-gif-8684191936841762266",
+"https://tenor.com/view/caranguejo-pandlr-man-crab-knife-pandlrg-faca-caranguejo-gif-13381866007168454019",
+"https://tenor.com/view/crab-knife-fight-gif-7305809"
+
 ]
 
 
 def get_mc():
-
     try:
         r = requests.get(PAIR_API, timeout=10)
         data = r.json()
@@ -51,38 +53,6 @@ def get_mc():
         return "MC unavailable"
 
 
-async def crab_blessing(message):
-
-    try:
-
-        roll = random.randint(1,777)
-
-        if roll != 1:
-            return
-
-        guild = message.guild
-        role_name = "Crab Blessing"
-
-        role = discord.utils.get(guild.roles, name=role_name)
-
-        if role is None:
-            role = await guild.create_role(name=role_name)
-
-        await message.author.add_roles(role)
-
-        embed = discord.Embed(
-            description=f"🦀 **THE CRAB GODS HAVE SPOKEN**\n\n{message.author.mention} has received the **CRAB BLESSING**",
-            color=0xff0000
-        )
-
-        embed.set_image(url=random.choice(crab_gifs))
-
-        await message.channel.send(embed=embed)
-
-    except:
-        pass
-
-
 class CrabButton(discord.ui.View):
 
     def __init__(self):
@@ -92,22 +62,14 @@ class CrabButton(discord.ui.View):
 
     async def press(self, interaction: discord.Interaction, button: discord.ui.Button):
 
-        try:
+        mc = get_mc()
 
-            mc = get_mc()
-            gif = random.choice(crab_gifs)
+        await interaction.response.send_message(
+            f"🦀 **{interaction.user.display_name} pressed the crab button 🔪**\nMC - {mc}"
+        )
 
-            embed = discord.Embed(
-                description=f"🦀 **{interaction.user.display_name} pressed the crab button 🔪**\n\nMC - {mc}",
-                color=0xff0000
-            )
-
-            embed.set_image(url=gif)
-
-            await interaction.response.send_message(embed=embed)
-
-        except:
-            await interaction.response.send_message("Crab malfunction 🦀", ephemeral=True)
+        for gif in crab_gifs:
+            await interaction.channel.send(gif)
 
 
 @client.event
@@ -121,43 +83,28 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    try:
 
-        if message.content == "!crab":
+    if message.content == "!crab":
 
-            mc = get_mc()
-            gif = random.choice(crab_gifs)
+        mc = get_mc()
 
-            embed = discord.Embed(
-                description=f"MC - {mc}",
-                color=0xff0000
-            )
+        await message.channel.send(f"MC - {mc}")
 
-            embed.set_image(url=gif)
-
-            await message.channel.send(embed=embed)
-
-            await crab_blessing(message)
+        for gif in crab_gifs:
+            await message.channel.send(gif)
 
 
-        if message.content == "!CRAB":
+    if message.content == "!CRAB":
 
-            mc = get_mc()
-            gif = random.choice(crab_gifs)
+        mc = get_mc()
 
-            embed = discord.Embed(
-                description=f"MC - {mc}\nDO NOT PRESS THE CRAB BUTTON",
-                color=0xff0000
-            )
+        await message.channel.send(
+            f"MC - {mc}\nDO NOT PRESS THE CRAB BUTTON",
+            view=CrabButton()
+        )
 
-            embed.set_image(url=gif)
-
-            await message.channel.send(embed=embed, view=CrabButton())
-
-            await crab_blessing(message)
-
-    except:
-        pass
+        for gif in crab_gifs:
+            await message.channel.send(gif)
 
 
 client.run(TOKEN)
