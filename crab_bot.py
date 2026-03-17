@@ -12,15 +12,13 @@ client = discord.Client(intents=intents)
 
 PAIR_API = "https://api.dexscreener.com/latest/dex/pairs/cronos/0xdf9030e28cde0f4e6f11c65362c5e152093c7414"
 
-# YOUR CRAB KNIFE GIFS
+# Tenor GIF IDs (stable)
 crab_gifs = [
-
-"https://media.tenor.com/Au4dF0h5s5kAAAAC/licking-knife-crabby-crab.gif",
-"https://media.tenor.com/VXH0m2CqzLQAAAAC/crab-with-a-knife.gif",
-"https://media.tenor.com/FqJq3hM6nC8AAAAC/stabby-crab.gif",
-"https://media.tenor.com/7O4hC4O5kqAAAAAC/crab-knife-pandlr.gif",
-"https://media.tenor.com/6sHqS4b3ZPAAAAAC/crab-knife-fight.gif"
-
+"https://tenor.com/view/licking-knife-crabby-crab-pikaole-threatening-menacing-gif-23124736",
+"https://tenor.com/view/fighting-crab-crab-with-a-knife-hes-got-a-knife-dont-touch-me-bro-get-off-gif-18793247",
+"https://tenor.com/view/threat-crabby-stabby-knife-stab-angry-gif-8684191936841762266",
+"https://tenor.com/view/caranguejo-pandlr-man-crab-knife-pandlrg-faca-caranguejo-gif-13381866007168454019",
+"https://tenor.com/view/crab-knife-fight-gif-7305809"
 ]
 
 
@@ -34,6 +32,7 @@ def get_mc():
 
         if mc >= 1_000_000:
             return f"${round(mc/1_000_000,2)}M"
+
         if mc >= 1_000:
             return f"${round(mc/1_000,2)}K"
 
@@ -43,7 +42,7 @@ def get_mc():
         return "MC unavailable"
 
 
-async def send_random_crab(channel):
+async def send_crab(channel):
 
     gif = random.choice(crab_gifs)
 
@@ -68,10 +67,10 @@ async def crab_blessing(message):
     await message.author.add_roles(role)
 
     await message.channel.send(
-        f"🔥 **THE CRAB GODS HAVE BLESSED {message.author.mention}** 🔥"
+        f"🔥 THE CRAB GODS HAVE BLESSED {message.author.mention} 🔥"
     )
 
-    await send_random_crab(message.channel)
+    await send_crab(message.channel)
 
 
 class CrabButton(discord.ui.View):
@@ -86,10 +85,10 @@ class CrabButton(discord.ui.View):
         mc = get_mc()
 
         await interaction.response.send_message(
-            f"🦀 **{interaction.user.display_name} pressed the crab button 🔪**\nMC - {mc}"
+            f"🦀 {interaction.user.display_name} pressed the crab button 🔪\nMC - {mc}"
         )
 
-        await send_random_crab(interaction.channel)
+        await send_crab(interaction.channel)
 
 
 @client.event
@@ -110,7 +109,7 @@ async def on_message(message):
 
         await message.channel.send(f"MC - {mc}")
 
-        await send_random_crab(message.channel)
+        await send_crab(message.channel)
 
         await crab_blessing(message)
 
@@ -124,7 +123,7 @@ async def on_message(message):
             view=CrabButton()
         )
 
-        await send_random_crab(message.channel)
+        await send_crab(message.channel)
 
         await crab_blessing(message)
 
