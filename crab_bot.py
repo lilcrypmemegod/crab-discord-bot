@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 import random
+import asyncio
 import os
 
 TOKEN = os.getenv("TOKEN")
@@ -17,6 +18,7 @@ crab_gifs = [
 "https://tenor.com/view/caranguejo-pandlr-man-crab-knife-pandlrg-faca-caranguejo-gif-13381866007168454019",
 "https://tenor.com/view/crab-knife-fight-gif-7305809"
 ]
+
 
 class CrabButton(discord.ui.View):
 
@@ -41,9 +43,11 @@ class CrabButton(discord.ui.View):
                 f"🦀 congratulations {interaction.user.mention} you have received the crab blessing the crab gods have blessed you 🦀"
             )
 
+
 @bot.event
 async def on_ready():
     print(f"Crab bot online as {bot.user}")
+
 
 @bot.command()
 async def crab(ctx):
@@ -51,6 +55,7 @@ async def crab(ctx):
     gif = random.choice(crab_gifs)
 
     await ctx.send(gif)
+
 
 @bot.command(name="CRAB")
 async def crab_button(ctx):
@@ -61,5 +66,30 @@ async def crab_button(ctx):
     )
 
     await ctx.send(embed=embed, view=CrabButton())
+
+
+@bot.command()
+@commands.has_permissions(manage_channels=True)
+async def lock(ctx, minutes: int):
+
+    channel = ctx.channel
+
+    overwrite = channel.overwrites_for(ctx.guild.default_role)
+    overwrite.send_messages = False
+
+    await channel.set_permissions(ctx.guild.default_role, overwrite=overwrite)
+
+    gif = random.choice(crab_gifs)
+
+    await ctx.send(f"🔒 Chat locked for {minutes} minutes 🦀")
+    await ctx.send(gif)
+
+    await asyncio.sleep(minutes * 60)
+
+    overwrite.send_messages = True
+    await channel.set_permissions(ctx.guild.default_role, overwrite=overwrite)
+
+    await ctx.send("🔓 Chat unlocked 🦀")
+
 
 bot.run(TOKEN)
