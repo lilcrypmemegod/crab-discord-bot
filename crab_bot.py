@@ -12,7 +12,6 @@ client = discord.Client(intents=intents)
 
 PAIR_API = "https://api.dexscreener.com/latest/dex/pairs/cronos/0xdf9030e28cde0f4e6f11c65362c5e152093c7414"
 
-# Tenor GIF IDs (stable)
 crab_gifs = [
 "https://tenor.com/view/licking-knife-crabby-crab-pikaole-threatening-menacing-gif-23124736",
 "https://tenor.com/view/fighting-crab-crab-with-a-knife-hes-got-a-knife-dont-touch-me-bro-get-off-gif-18793247",
@@ -32,7 +31,6 @@ def get_mc():
 
         if mc >= 1_000_000:
             return f"${round(mc/1_000_000,2)}M"
-
         if mc >= 1_000:
             return f"${round(mc/1_000,2)}K"
 
@@ -42,14 +40,9 @@ def get_mc():
         return "MC unavailable"
 
 
-async def send_crab(channel):
-
+async def send_random_gif(channel):
     gif = random.choice(crab_gifs)
-
-    embed = discord.Embed(color=0xff0000)
-    embed.set_image(url=gif)
-
-    await channel.send(embed=embed)
+    await channel.send(gif)
 
 
 async def crab_blessing(message):
@@ -70,7 +63,7 @@ async def crab_blessing(message):
         f"🔥 THE CRAB GODS HAVE BLESSED {message.author.mention} 🔥"
     )
 
-    await send_crab(message.channel)
+    await send_random_gif(message.channel)
 
 
 class CrabButton(discord.ui.View):
@@ -88,7 +81,7 @@ class CrabButton(discord.ui.View):
             f"🦀 {interaction.user.display_name} pressed the crab button 🔪\nMC - {mc}"
         )
 
-        await send_crab(interaction.channel)
+        await send_random_gif(interaction.channel)
 
 
 @client.event
@@ -109,7 +102,7 @@ async def on_message(message):
 
         await message.channel.send(f"MC - {mc}")
 
-        await send_crab(message.channel)
+        await send_random_gif(message.channel)
 
         await crab_blessing(message)
 
@@ -123,7 +116,7 @@ async def on_message(message):
             view=CrabButton()
         )
 
-        await send_crab(message.channel)
+        await send_random_gif(message.channel)
 
         await crab_blessing(message)
 
