@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
-import os
 import requests
+import os
 import random
 
 TOKEN = os.getenv("TOKEN")
@@ -14,9 +14,9 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 PAIR_API = "https://api.dexscreener.com/latest/dex/pairs/cronos/0xdf9030e28cde0f4e6f11c65362c5e152093c7414"
 
 crab_gifs = [
-"https://media.tenor.com/9Y6n4d4V3eUAAAAC/crab-knife.gif",
-"https://media.tenor.com/NqKNh7Q5hL8AAAAC/crab-knife-crab.gif",
-"https://media.tenor.com/YZ9JX3KX6xYAAAAC/crab-dance-knife.gif"
+"https://media.tenor.com/Z6gmDPeM6dgAAAAC/crab-dance.gif",
+"https://media.tenor.com/W5gq7HnYx6QAAAAC/crab-rave.gif",
+"https://media.tenor.com/f8dZ8iKz9hAAAAAC/crab-dance-party.gif"
 ]
 
 
@@ -38,14 +38,17 @@ def get_mc():
 
 class CrabButton(discord.ui.View):
 
+    def __init__(self):
+        super().__init__(timeout=None)
+
     @discord.ui.button(label="CRAB", style=discord.ButtonStyle.danger)
     async def crab(self, interaction: discord.Interaction, button: discord.ui.Button):
 
-        gif = random.choice(crab_gifs)
         mc = get_mc()
+        gif = random.choice(crab_gifs)
 
         embed = discord.Embed(
-            description=f"🦀 **SOMEONE PRESSED THE CRAB BUTTON** 🔪\n\nMC - {mc}",
+            description=f"SOMEONE PRESSED THE CRAB BUTTON 🔪\n\nMC - {mc}",
             color=0xff0000
         )
 
@@ -54,7 +57,12 @@ class CrabButton(discord.ui.View):
         await interaction.response.send_message(embed=embed)
 
 
-@bot.command(name="crab")
+@bot.event
+async def on_ready():
+    print(f"Bot connected as {bot.user}")
+
+
+@bot.command()
 async def crab(ctx):
 
     mc = get_mc()
@@ -62,8 +70,8 @@ async def crab(ctx):
 
     user_text = ctx.message.content
 
-    # LOWERCASE COMMAND
-    if user_text.startswith("!crab") and not user_text.startswith("!CRAB"):
+    # LOWERCASE !crab
+    if user_text == "!crab":
 
         embed = discord.Embed(
             description=f"MC - {mc}",
@@ -75,11 +83,11 @@ async def crab(ctx):
         await ctx.send(embed=embed)
 
 
-    # UPPERCASE COMMAND
-    if user_text.startswith("!CRAB"):
+    # UPPERCASE !CRAB
+    if user_text == "!CRAB":
 
         embed = discord.Embed(
-            description=f"MC - {mc}\nDO NOT PRESS THE CRAB BUTTON.",
+            description=f"MC - {mc}\nDO NOT PRESS THE CRAB BUTTON",
             color=0xff0000
         )
 
