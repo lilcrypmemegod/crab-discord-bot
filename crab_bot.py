@@ -1,23 +1,24 @@
 import discord
+from discord.ext import commands
 import requests
-import os
 import random
+import os
 
 TOKEN = os.getenv("TOKEN")
 
 intents = discord.Intents.default()
 intents.message_content = True
 
-client = discord.Client(intents=intents)
+bot = commands.Bot(command_prefix="!", intents=intents)
 
 PAIR_API = "https://api.dexscreener.com/latest/dex/pairs/cronos/0xdf9030e28cde0f4e6f11c65362c5e152093c7414"
 
 crab_gifs = [
-"https://tenor.com/view/licking-knife-crabby-crab-pikaole-threatening-menacing-gif-23124736",
-"https://tenor.com/view/fighting-crab-crab-with-a-knife-hes-got-a-knife-dont-touch-me-bro-get-off-gif-18793247",
-"https://tenor.com/view/threat-crabby-stabby-knife-stab-angry-gif-8684191936841762266",
-"https://tenor.com/view/caranguejo-pandlr-man-crab-knife-pandlrg-faca-caranguejo-gif-13381866007168454019",
-"https://tenor.com/view/crab-knife-fight-gif-7305809"
+"https://media.tenor.com/Au4dFOh5s5kAAAAC/licking-knife-crabby-crab.gif",
+"https://media.tenor.com/VXH0m2CqzLQAAAAC/crab-with-a-knife.gif",
+"https://media.tenor.com/FqJq3hM6nC8AAAAC/stabby-crab.gif",
+"https://media.tenor.com/704hC405kqAAAAAC/crab-knife-pandlr.gif",
+"https://media.tenor.com/6sHqS4b3ZPAAAAAC/crab-knife-fight.gif"
 ]
 
 
@@ -26,11 +27,12 @@ def get_mc():
         r = requests.get(PAIR_API, timeout=10)
         data = r.json()
 
-        pair = data.get("pair")
+        pair = data["pair"]
         mc = pair.get("marketCap") or pair.get("fdv")
 
         if mc >= 1_000_000:
             return f"${round(mc/1_000_000,2)}M"
+
         if mc >= 1_000:
             return f"${round(mc/1_000,2)}K"
 
@@ -40,6 +42,33 @@ def get_mc():
         return "MC unavailable"
 
 
+async def crab_blessing(ctx):
+
+    if random.randint(1,777) != 1:
+        return
+
+    role_name = "crab blessing"
+
+    role = discord.utils.get(ctx.guild.roles, name=role_name)
+
+    if role is None:
+        role = await ctx.guild.create_role(name=role_name)
+
+    await ctx.author.add_roles(role)
+
+    username = ctx.author.display_name
+
+    embed = discord.Embed(
+        title="🦀 CRAB BLESSING 🦀",
+        description=f"🦀 **Congratulations {username}!**\n\nYou have received the **crab blessing**.\nThe crab gods have blessed you. 🦀",
+        color=0xff0000
+    )
+
+    embed.set_image(url=random.choice(crab_gifs))
+
+    await ctx.send(embed=embed)
+
+
 class CrabButton(discord.ui.View):
 
     def __init__(self):
@@ -47,44 +76,56 @@ class CrabButton(discord.ui.View):
 
     @discord.ui.button(label="CRAB", style=discord.ButtonStyle.danger)
 
-    async def press(self, interaction: discord.Interaction, button: discord.ui.Button):
+    async def crab_press(self, interaction: discord.Interaction, button: discord.ui.Button):
 
         mc = get_mc()
         gif = random.choice(crab_gifs)
 
         embed = discord.Embed(
-            title="CRAB BUTTON PRESSED",
             description=f"🦀 **{interaction.user.display_name} pressed the crab button**\n\nMC - {mc}",
             color=0xff0000
         )
 
         embed.set_image(url=gif)
 
-        # remove button
         await interaction.response.edit_message(embed=embed, view=None)
 
 
-@client.event
+@bot.event
 async def on_ready():
-    print(f"Crab bot running as {client.user}")
+    print(f"Crab bot online as {bot.user}")
 
 
-@client.event
-async def on_message(message):
+@bot.command()
+async def crab(ctx):
 
-    if message.author == client.user:
-        return
+    mc = get_mc()
 
-    if message.content == "!CRAB":
+    embed = discord.Embed(
+        description=f"MC - {mc}",
+        color=0xff0000
+    )
 
-        mc = get_mc()
+    embed.set_image(url=random.choice(crab_gifs))
 
-        embed = discord.Embed(
-            description=f"MC - {mc}\n\n**DO NOT PRESS THE CRAB BUTTON**",
-            color=0xff0000
-        )
+    await ctx.send(embed=embed)
 
-        await message.channel.send(embed=embed, view=CrabButton())
+    await crab_blessing(ctx)
 
 
-client.run(TOKEN)
+@bot.command()
+async def CRAB(ctx):
+
+    mc = get_mc()
+
+    embed = discord.Embed(
+        description=f"MC - {mc}\n\n**DO NOT PRESS THE CRAB BUTTON**",
+        color=0xff0000
+    )
+
+    await ctx.send(embed=embed, view=CrabButton())
+
+    await crab_blessing(ctx)
+
+
+bot.run(TOKEN)
