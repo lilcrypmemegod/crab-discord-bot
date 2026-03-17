@@ -11,7 +11,7 @@ intents.message_content = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-# YOUR ORIGINAL KNIFE CRAB GIFS
+# KNIFE CRAB GIFS YOU SENT
 crab_gifs = [
 "https://tenor.com/view/licking-knife-crabby-crab-pikaole-threatening-menacing-gif-23124736",
 "https://tenor.com/view/fighting-crab-crab-with-a-knife-hes-got-a-knife-dont-touch-me-bro-get-off-gif-18793247",
@@ -53,7 +53,7 @@ async def on_ready():
     print(f"Crab bot online as {bot.user}")
 
 
-# POST RANDOM CRAB GIF
+# RANDOM CRAB GIF COMMAND
 @bot.command()
 async def crab(ctx):
 
@@ -64,21 +64,21 @@ async def crab(ctx):
     await ctx.send(gif)
 
 
-# SPAWN CRAB BUTTON
+# CRAB BUTTON SPAWN
 @bot.command(name="CRAB")
 async def crab_button(ctx):
 
     await ctx.message.delete()
 
     embed = discord.Embed(
-        description=f"🚨 DO NOT PRESS THE CRAB BUTTON 🚨\n\nsummoned by {ctx.author.mention}",
+        description="🚨 DO NOT PRESS THE CRAB BUTTON 🚨",
         color=discord.Color.red()
     )
 
     await ctx.send(embed=embed, view=CrabButton())
 
 
-# RAID LOCK
+# RAID LOCK (ADMIN ONLY)
 @bot.command()
 @commands.has_permissions(administrator=True)
 async def lock(ctx, minutes: int):
