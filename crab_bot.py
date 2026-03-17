@@ -11,13 +11,13 @@ intents.message_content = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-# knife crab gifs (embed properly)
+# YOUR ORIGINAL CRAB GIFS
 crab_gifs = [
-"https://media.tenor.com/8d9b48c7a07f9dcbfcba1cc403a53d58/tenor.gif",
-"https://media.tenor.com/1f21d71f7d23d5d7d64f3f7e5f6e4f3c/tenor.gif",
-"https://media.tenor.com/2g7uGZ6q9x0AAAAd/crab-battle.gif",
-"https://media.tenor.com/4s8Kk7Y7k8gAAAAd/crab-dance.gif",
-"https://media.tenor.com/6Z3YvE8PpJQAAAAd/crab-knife.gif"
+"https://tenor.com/view/licking-knife-crabby-crab-pikaole-threatening-menacing-gif-23124736",
+"https://tenor.com/view/fighting-crab-crab-with-a-knife-hes-got-a-knife-dont-touch-me-bro-get-off-gif-18793247",
+"https://tenor.com/view/threat-crabby-stabby-knife-stab-angry-gif-8684191936841762266",
+"https://tenor.com/view/caranguejo-pandlr-man-crab-knife-pandlrg-faca-caranguejo-gif-13381866007168454019",
+"https://tenor.com/view/crab-knife-fight-gif-7305809"
 ]
 
 
@@ -37,10 +37,7 @@ class CrabButton(discord.ui.View):
             f"🦀 {interaction.user.name} pressed the crab button 🦀"
         )
 
-        embed = discord.Embed(color=discord.Color.red())
-        embed.set_image(url=gif)
-
-        await interaction.followup.send(embed=embed)
+        await interaction.followup.send(gif)
 
         if random.randint(1,777) == 1:
             await interaction.followup.send(
@@ -53,7 +50,7 @@ async def on_ready():
     print(f"Crab bot online as {bot.user}")
 
 
-# crab gif command
+# !crab command
 @bot.command()
 async def crab(ctx):
 
@@ -61,13 +58,10 @@ async def crab(ctx):
 
     gif = random.choice(crab_gifs)
 
-    embed = discord.Embed(color=discord.Color.red())
-    embed.set_image(url=gif)
-
-    await ctx.send(embed=embed)
+    await ctx.send(gif)
 
 
-# crab button command
+# !CRAB button
 @bot.command(name="CRAB")
 async def crab_button(ctx):
 
@@ -100,10 +94,7 @@ async def lock(ctx, minutes: int):
 
     await ctx.send("🚨🦀 CRAB RAID LOCKDOWN 🦀🚨\n🔒 Chat locked")
 
-    embed = discord.Embed(color=discord.Color.red())
-    embed.set_image(url=gif)
-
-    await ctx.send(embed=embed)
+    await ctx.send(gif)
 
     await asyncio.sleep(minutes * 60)
 
@@ -113,7 +104,7 @@ async def lock(ctx, minutes: int):
     await ctx.send("🔓 Chat unlocked 🦀")
 
 
-# UNLOCK COMMAND
+# UNLOCK
 @bot.command()
 @commands.has_permissions(administrator=True)
 async def unlock(ctx):
