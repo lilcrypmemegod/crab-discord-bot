@@ -5,7 +5,6 @@ import asyncio
 import os
 import requests
 import aiohttp
-import io
 import re
 
 TOKEN = os.getenv("TOKEN")
@@ -19,7 +18,7 @@ RAID_ROLE = "Raid Commander"
 
 DEX_URL = "https://api.dexscreener.com/latest/dex/pairs/cronos/0xdf9030e28cde0f4e6f11c65362c5e152093c7414"
 
-# ✅ YOUR TENOR LINKS
+# ✅ YOUR ORIGINAL GIFS (UNCHANGED)
 crab_gifs = [
 "https://tenor.com/view/licking-knife-crabby-crab-pikaole-threatening-menacing-gif-23124736",
 "https://tenor.com/view/fighting-crab-crab-with-a-knife-hes-got-a-knife-dont-touch-me-bro-get-off-gif-18793247",
@@ -29,19 +28,27 @@ crab_gifs = [
 ]
 
 # ------------------------
-# GET MC
+# GET MC (DEXSCREENER)
 # ------------------------
 def get_mc():
     try:
         data = requests.get(DEX_URL).json()
         pair = data["pairs"][0]
-        mc = float(pair.get("fdv", 0))
+
+        # ✅ STRICT: use ONLY marketCap (fixes wrong MC)
+        mc_raw = pair.get("marketCap")
+
+        if mc_raw is None:
+            return "N/A"
+
+        mc = float(mc_raw)
 
         if mc >= 1_000_000:
             return f"${mc/1_000_000:.2f}M"
         elif mc >= 1_000:
             return f"${(int(mc/100)/10):.1f}K"
         return f"${int(mc)}"
+
     except:
         return "N/A"
 
@@ -63,40 +70,35 @@ async def update_mc():
         await asyncio.sleep(60)
 
 # ------------------------
-# 🔥 EXTRACT REAL GIF
+# FIX TENOR → REAL GIF
 # ------------------------
-async def extract_gif(url):
+async def get_real_gif(url):
     try:
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as resp:
                 html = await resp.text()
 
                 match = re.search(r'https://media\.tenor\.com/[^"]+\.gif', html)
+
                 if match:
                     return match.group(0)
     except:
-        return None
+        pass
+
+    return None
 
 # ------------------------
-# SEND GIF
+# SEND GIF (WORKING)
 # ------------------------
 async def send_gif(channel):
     url = random.choice(crab_gifs)
 
-    real_gif = await extract_gif(url)
+    gif = await get_real_gif(url)
 
-    if real_gif:
-        try:
-            async with aiohttp.ClientSession() as session:
-                async with session.get(real_gif) as resp:
-                    data = await resp.read()
-                    file = discord.File(io.BytesIO(data), filename="crab.gif")
-                    await channel.send(file=file)
-                    return
-        except:
-            pass
-
-    await channel.send("❌ GIF failed")
+    if gif:
+        await channel.send(gif)
+    else:
+        await channel.send("❌ GIF failed")
 
 # ------------------------
 # BUTTON
@@ -133,7 +135,7 @@ async def on_ready():
     bot.loop.create_task(update_mc())
 
 # ------------------------
-# !crab
+# !crab (GIF ONLY)
 # ------------------------
 @bot.command()
 async def crab(ctx):
@@ -143,7 +145,7 @@ async def crab(ctx):
         await ctx.send(f"✨🦀 {ctx.author.mention} received the crab blessing 🦀✨")
 
 # ------------------------
-# !CRAB
+# !CRAB (BUTTON)
 # ------------------------
 @bot.command(name="CRAB")
 async def crab_button(ctx):
