@@ -18,7 +18,7 @@ RAID_ROLE = "Raid Commander"
 
 DEX_URL = "https://api.dexscreener.com/latest/dex/pairs/cronos/0xdf9030e28cde0f4e6f11c65362c5e152093c7414"
 
-# ✅ YOUR ORIGINAL GIFS (UNCHANGED)
+# ✅ YOUR GIFS (UNCHANGED)
 crab_gifs = [
 "https://tenor.com/view/licking-knife-crabby-crab-pikaole-threatening-menacing-gif-23124736",
 "https://tenor.com/view/fighting-crab-crab-with-a-knife-hes-got-a-knife-dont-touch-me-bro-get-off-gif-18793247",
@@ -28,20 +28,18 @@ crab_gifs = [
 ]
 
 # ------------------------
-# GET MC (DEXSCREENER)
+# GET MC (ACCURATE)
 # ------------------------
 def get_mc():
     try:
         data = requests.get(DEX_URL).json()
         pair = data["pairs"][0]
+        mc = pair.get("marketCap")
 
-        # ✅ STRICT: use ONLY marketCap (fixes wrong MC)
-        mc_raw = pair.get("marketCap")
-
-        if mc_raw is None:
+        if mc is None:
             return "N/A"
 
-        mc = float(mc_raw)
+        mc = float(mc)
 
         if mc >= 1_000_000:
             return f"${mc/1_000_000:.2f}M"
@@ -70,7 +68,7 @@ async def update_mc():
         await asyncio.sleep(60)
 
 # ------------------------
-# FIX TENOR → REAL GIF
+# EXTRACT REAL GIF
 # ------------------------
 async def get_real_gif(url):
     try:
@@ -79,7 +77,6 @@ async def get_real_gif(url):
                 html = await resp.text()
 
                 match = re.search(r'https://media\.tenor\.com/[^"]+\.gif', html)
-
                 if match:
                     return match.group(0)
     except:
@@ -88,17 +85,16 @@ async def get_real_gif(url):
     return None
 
 # ------------------------
-# SEND GIF (WORKING)
+# SEND GIF
 # ------------------------
 async def send_gif(channel):
     url = random.choice(crab_gifs)
-
     gif = await get_real_gif(url)
 
     if gif:
         await channel.send(gif)
     else:
-        await channel.send("❌ GIF failed")
+        await channel.send("❌ gif failed")
 
 # ------------------------
 # BUTTON
@@ -116,15 +112,10 @@ class CrabButton(discord.ui.View):
         await interaction.response.edit_message(view=self)
 
         await interaction.followup.send(
-            f"🦀 {interaction.user.mention} pressed the crab button 🦀"
+            f"🚨🦀 {interaction.user.mention} pressed the crab button 🦀🚨"
         )
 
         await send_gif(interaction.channel)
-
-        if random.randint(1,777) == 1:
-            await interaction.followup.send(
-                f"✨🦀 {interaction.user.mention} received the crab blessing 🦀✨"
-            )
 
 # ------------------------
 # READY
@@ -135,17 +126,20 @@ async def on_ready():
     bot.loop.create_task(update_mc())
 
 # ------------------------
-# !crab (GIF ONLY)
+# !crab
 # ------------------------
 @bot.command()
 async def crab(ctx):
+
     await send_gif(ctx.channel)
 
     if random.randint(1,777) == 1:
-        await ctx.send(f"✨🦀 {ctx.author.mention} received the crab blessing 🦀✨")
+        await ctx.send(
+            f"✨🦀 {ctx.author.mention} you have received the crab blessing the crab gods have blessed you 🦀✨"
+        )
 
 # ------------------------
-# !CRAB (BUTTON)
+# !CRAB
 # ------------------------
 @bot.command(name="CRAB")
 async def crab_button(ctx):
@@ -158,7 +152,7 @@ async def crab_button(ctx):
     await ctx.send(embed=embed, view=CrabButton())
 
 # ------------------------
-# LOCK
+# LOCK (REAL LOCKDOWN)
 # ------------------------
 @bot.command()
 async def lock(ctx, minutes: int, raid_link: str = None):
@@ -168,16 +162,13 @@ async def lock(ctx, minutes: int, raid_link: str = None):
 
     channel = ctx.channel
     guild = ctx.guild
+    everyone = guild.default_role
 
-    for role in guild.roles:
-        if role.permissions.administrator:
-            continue
+    overwrite = channel.overwrites_for(everyone)
+    overwrite.send_messages = False
+    await channel.set_permissions(everyone, overwrite=overwrite)
 
-        overwrite = channel.overwrites_for(role)
-        overwrite.send_messages = False
-        await channel.set_permissions(role, overwrite=overwrite)
-
-    msg = f"🚨🦀 RAID ALERT 🦀🚨\n@everyone\n🔒 Chat locked\n"
+    msg = "🚨🦀 RAID ALERT 🦀🚨\n@everyone\n🔒 Chat locked\n"
 
     if raid_link:
         msg += f"\n⚔️ RAID HERE ⚔️\n{raid_link}\n"
@@ -186,18 +177,19 @@ async def lock(ctx, minutes: int, raid_link: str = None):
 
     await send_gif(channel)
 
-    while minutes > 0:
+    remaining = minutes
+
+    while remaining > 0:
         await asyncio.sleep(60)
-        minutes -= 1
-        if minutes > 0:
-            await countdown.edit(content=msg + f"\n⏳ {minutes} minutes")
+        remaining -= 1
 
-    for role in guild.roles:
-        overwrite = channel.overwrites_for(role)
-        overwrite.send_messages = None
-        await channel.set_permissions(role, overwrite=overwrite)
+        if remaining > 0:
+            await countdown.edit(content=msg + f"\n⏳ {remaining} minutes")
 
-    await ctx.send("🔓 Chat unlocked 🦀")
+    overwrite.send_messages = None
+    await channel.set_permissions(everyone, overwrite=overwrite)
+
+    await ctx.send("🔓 Chat unlocked")
 
 # ------------------------
 # UNLOCK
@@ -208,11 +200,13 @@ async def unlock(ctx):
     if RAID_ROLE not in [r.name for r in ctx.author.roles]:
         return
 
-    for role in ctx.guild.roles:
-        overwrite = ctx.channel.overwrites_for(role)
-        overwrite.send_messages = None
-        await ctx.channel.set_permissions(role, overwrite=overwrite)
+    channel = ctx.channel
+    everyone = ctx.guild.default_role
 
-    await ctx.send("🔓 Emergency unlock 🦀")
+    overwrite = channel.overwrites_for(everyone)
+    overwrite.send_messages = None
+    await channel.set_permissions(everyone, overwrite=overwrite)
+
+    await ctx.send("🔓 Emergency unlock")
 
 bot.run(TOKEN)
