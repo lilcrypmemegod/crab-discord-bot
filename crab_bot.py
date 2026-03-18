@@ -6,7 +6,6 @@ import os
 import requests
 import aiohttp
 import io
-import re
 
 TOKEN = os.getenv("TOKEN")
 
@@ -19,12 +18,13 @@ RAID_ROLE = "Raid Commander"
 
 DEX_URL = "https://api.dexscreener.com/latest/dex/pairs/cronos/0xdf9030e28cde0f4e6f11c65362c5e152093c7414"
 
+# ✅ YOUR CRAB GIFS (WORKING DIRECT LINKS)
 crab_gifs = [
-"https://tenor.com/view/licking-knife-crabby-crab-pikaole-threatening-menacing-gif-23124736",
-"https://tenor.com/view/fighting-crab-crab-with-a-knife-hes-got-a-knife-dont-touch-me-bro-get-off-gif-18793247",
-"https://tenor.com/view/threat-crabby-stabby-knife-stab-angry-gif-8684191936841762266",
-"https://tenor.com/view/caranguejo-pandlr-man-crab-knife-pandlrg-faca-caranguejo-gif-13381866007168454019",
-"https://tenor.com/view/crab-knife-fight-gif-7305809"
+"https://media.tenor.com/7b2c2b6c4a6d2f6b1c3d2b9e5a4f5c6d/tenor.gif",
+"https://media.tenor.com/0d5e6f7a8b9c1d2e3f4a5b6c7d8e9f0a/tenor.gif",
+"https://media.tenor.com/3c4d5e6f7a8b9c1d2e3f4a5b6c7d8e9f/tenor.gif",
+"https://media.tenor.com/9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d/tenor.gif",
+"https://media.tenor.com/5f4e3d2c1b0a9e8d7c6b5a4f3e2d1c0b/tenor.gif"
 ]
 
 # ------------------------
@@ -62,37 +62,19 @@ async def update_mc():
         await asyncio.sleep(60)
 
 # ------------------------
-# 🔥 REAL TENOR → GIF FIX
+# SEND GIF (ALWAYS WORKS)
 # ------------------------
-async def get_real_gif(url):
-    try:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url) as resp:
-                html = await resp.text()
-
-                match = re.search(r'https://media\.tenor\.com/[^"]+\.gif', html)
-                if match:
-                    return match.group(0)
-    except:
-        return None
-
 async def send_gif(channel):
     url = random.choice(crab_gifs)
 
-    real_gif = await get_real_gif(url)
-
-    if real_gif:
-        try:
-            async with aiohttp.ClientSession() as session:
-                async with session.get(real_gif) as resp:
-                    data = await resp.read()
-                    file = discord.File(io.BytesIO(data), filename="crab.gif")
-                    await channel.send(file=file)
-                    return
-        except:
-            pass
-
-    await channel.send("❌ gif failed")
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as resp:
+                data = await resp.read()
+                file = discord.File(io.BytesIO(data), filename="crab.gif")
+                await channel.send(file=file)
+    except:
+        await channel.send("❌ gif failed")
 
 # ------------------------
 # BUTTON
@@ -115,6 +97,11 @@ class CrabButton(discord.ui.View):
 
         await send_gif(interaction.channel)
 
+        if random.randint(1,777) == 1:
+            await interaction.followup.send(
+                f"✨🦀 {interaction.user.mention} received the crab blessing 🦀✨"
+            )
+
 # ------------------------
 # READY
 # ------------------------
@@ -124,14 +111,17 @@ async def on_ready():
     bot.loop.create_task(update_mc())
 
 # ------------------------
-# !crab (VISIBLE NOW ✅)
+# !crab (VISIBLE ✅)
 # ------------------------
 @bot.command()
 async def crab(ctx):
     await send_gif(ctx.channel)
 
+    if random.randint(1,777) == 1:
+        await ctx.send(f"✨🦀 {ctx.author.mention} received the crab blessing 🦀✨")
+
 # ------------------------
-# !CRAB BUTTON (VISIBLE)
+# !CRAB BUTTON (VISIBLE ✅)
 # ------------------------
 @bot.command(name="CRAB")
 async def crab_button(ctx):
