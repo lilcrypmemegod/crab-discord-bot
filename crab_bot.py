@@ -3,6 +3,7 @@ from discord.ext import commands
 import random
 import asyncio
 import os
+import requests
 
 TOKEN = os.getenv("TOKEN")
 
@@ -13,6 +14,25 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 
 lock_active = False
 RAID_ROLE = "Raid Commander"
+
+# DEXSCREENER FUNCTION
+def get_mc():
+    try:
+        url = "https://api.dexscreener.com/latest/dex/pairs/cronos/0xdf9030e28cde0f4e6f11c65362c5e152093c7414"
+        data = requests.get(url).json()
+
+        mc = float(data["pair"]["fdv"])
+
+        if mc >= 1_000_000:
+            return f"${mc/1_000_000:.2f}M"
+        elif mc >= 1_000:
+            return f"${mc/1_000:.1f}K"
+        else:
+            return f"${mc:.0f}"
+
+    except:
+        return "MC unavailable"
+
 
 crab_gifs = [
 "https://tenor.com/view/licking-knife-crabby-crab-pikaole-threatening-menacing-gif-23124736",
@@ -38,6 +58,7 @@ class CrabButton(discord.ui.View):
     async def crab(self, interaction: discord.Interaction, button: discord.ui.Button):
 
         gif = random.choice(crab_gifs)
+        mc = get_mc()
 
         button.disabled = True
         button.label = "CRABBED"
@@ -48,9 +69,8 @@ class CrabButton(discord.ui.View):
             f"🦀 {interaction.user.mention} pressed the crab button 🦀"
         )
 
-        await interaction.followup.send(gif)
+        await interaction.followup.send(f"{gif}\n💰 MC: {mc}")
 
-        # blessing on button
         if random.randint(1,777) == 1:
             await interaction.followup.send(
                 f"✨🦀 CRAB BLESSING 🦀✨\n{interaction.user.mention} has been chosen"
@@ -70,9 +90,10 @@ async def on_ready():
 async def crab(ctx):
 
     gif = random.choice(crab_gifs)
-    await ctx.send(gif)
+    mc = get_mc()
 
-    # blessing on !crab
+    await ctx.send(f"{gif}\n💰 MC: {mc}")
+
     if random.randint(1,777) == 1:
         await ctx.send(
             f"✨🦀 CRAB BLESSING 🦀✨\n{ctx.author.mention} has been chosen"
@@ -118,7 +139,6 @@ async def lock(ctx, minutes: int, raid_link: str):
 
     await ctx.send(gif)
 
-    # FAST LOCK
     overwrite = channel.overwrites_for(guild.default_role)
     overwrite.send_messages = False
     await channel.set_permissions(guild.default_role, overwrite=overwrite)
