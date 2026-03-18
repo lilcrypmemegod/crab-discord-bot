@@ -50,9 +50,10 @@ class CrabButton(discord.ui.View):
 
         await interaction.followup.send(gif)
 
+        # blessing on button
         if random.randint(1,777) == 1:
             await interaction.followup.send(
-                f"🦀 congratulations {interaction.user.mention} you have received the crab blessing 🦀"
+                f"✨🦀 CRAB BLESSING 🦀✨\n{interaction.user.mention} has been chosen"
             )
 
 
@@ -61,13 +62,21 @@ async def on_ready():
     print(f"Crab bot online as {bot.user}")
 
 
+# ----------------
 # PUBLIC COMMANDS
+# ----------------
 
 @bot.command()
 async def crab(ctx):
 
     gif = random.choice(crab_gifs)
     await ctx.send(gif)
+
+    # blessing on !crab
+    if random.randint(1,777) == 1:
+        await ctx.send(
+            f"✨🦀 CRAB BLESSING 🦀✨\n{ctx.author.mention} has been chosen"
+        )
 
 
 @bot.command(name="CRAB")
@@ -81,7 +90,9 @@ async def crab_button(ctx):
     await ctx.send(embed=embed, view=CrabButton())
 
 
+# ----------------
 # RAID COMMANDS
+# ----------------
 
 @bot.command()
 @is_raid_commander()
@@ -107,6 +118,7 @@ async def lock(ctx, minutes: int, raid_link: str):
 
     await ctx.send(gif)
 
+    # FAST LOCK
     overwrite = channel.overwrites_for(guild.default_role)
     overwrite.send_messages = False
     await channel.set_permissions(guild.default_role, overwrite=overwrite)
@@ -116,11 +128,9 @@ async def lock(ctx, minutes: int, raid_link: str):
     while remaining > 0 and lock_active:
 
         await asyncio.sleep(60)
-
         remaining -= 1
 
         if remaining > 0:
-
             await message.edit(
                 content=
                 f"🚨🦀 **RAID ALERT** 🦀🚨\n"
