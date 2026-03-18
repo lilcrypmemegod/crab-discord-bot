@@ -4,8 +4,6 @@ import random
 import asyncio
 import os
 import requests
-import aiohttp
-import io
 
 TOKEN = os.getenv("TOKEN")
 
@@ -15,15 +13,16 @@ intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 RAID_ROLE = "Raid Commander"
-lock_active = False
 
 DEX_URL = "https://api.dexscreener.com/latest/dex/pairs/cronos/0xdf9030e28cde0f4e6f11c65362c5e152093c7414"
 
-# ✅ YOUR GIF LINKS (KEEP YOUR TENOR LINKS)
+# ✅ YOUR TENOR LINKS (UNCHANGED)
 crab_gifs = [
-"https://media.tenor.com/4s8Kk7Y7k8gAAAAd/crab-dance.gif",
-"https://media.tenor.com/6Z3YvE8PpJQAAAAd/crab-knife.gif",
-"https://media.tenor.com/8d9b48c7a07f9dcbfcba1cc403a53d58/tenor.gif"
+"https://tenor.com/view/licking-knife-crabby-crab-pikaole-threatening-menacing-gif-23124736",
+"https://tenor.com/view/fighting-crab-crab-with-a-knife-hes-got-a-knife-dont-touch-me-bro-get-off-gif-18793247",
+"https://tenor.com/view/threat-crabby-stabby-knife-stab-angry-gif-8684191936841762266",
+"https://tenor.com/view/caranguejo-pandlr-man-crab-knife-pandlrg-faca-caranguejo-gif-13381866007168454019",
+"https://tenor.com/view/crab-knife-fight-gif-7305809"
 ]
 
 # ------------------------
@@ -59,33 +58,24 @@ async def update_mc():
             except:
                 pass
 
-        await bot.change_presence(
-            activity=discord.Activity(
-                type=discord.ActivityType.watching,
-                name=f"MC - {mc}"
-            )
-        )
-
         await asyncio.sleep(60)
 
 
 # ------------------------
-# ✅ FINAL GIF FIX (SEND AS FILE)
+# ✅ FIXED GIF SENDER (TENOR EMBED)
 # ------------------------
 async def send_gif(channel):
-    gif_url = random.choice(crab_gifs)
+    url = random.choice(crab_gifs)
 
-    try:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(gif_url) as resp:
-                if resp.status == 200:
-                    data = await resp.read()
-                    file = discord.File(io.BytesIO(data), filename="crab.gif")
-                    await channel.send(file=file)
-                else:
-                    await channel.send("🦀")
-    except:
-        await channel.send("🦀")
+    # convert tenor view → embed
+    if "tenor.com/view" in url:
+        try:
+            gif_id = url.split("-")[-1]
+            url = f"https://tenor.com/embed/{gif_id}"
+        except:
+            pass
+
+    await channel.send(url)
 
 
 # ------------------------
