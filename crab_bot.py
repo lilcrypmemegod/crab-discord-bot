@@ -54,10 +54,12 @@ async def on_ready():
     print(f"Crab bot online as {bot.user}")
 
 
+# ----------------
+# VISIBLE COMMANDS
+# ----------------
+
 @bot.command()
 async def crab(ctx):
-
-    await ctx.message.delete()
 
     gif = random.choice(crab_gifs)
     await ctx.send(gif)
@@ -66,8 +68,6 @@ async def crab(ctx):
 @bot.command(name="CRAB")
 async def crab_button(ctx):
 
-    await ctx.message.delete()
-
     embed = discord.Embed(
         description="🚨 DO NOT PRESS THE CRAB BUTTON 🚨",
         color=discord.Color.red()
@@ -75,6 +75,10 @@ async def crab_button(ctx):
 
     await ctx.send(embed=embed, view=CrabButton())
 
+
+# ----------------
+# HIDDEN COMMANDS
+# ----------------
 
 @bot.command()
 @commands.has_permissions(administrator=True)
