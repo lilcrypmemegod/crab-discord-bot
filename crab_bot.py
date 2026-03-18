@@ -12,20 +12,20 @@ intents.message_content = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-lock_active = False
 RAID_ROLE = "Raid Commander"
+lock_active = False
 
 DEX_URL = "https://api.dexscreener.com/latest/dex/pairs/cronos/0xdf9030e28cde0f4e6f11c65362c5e152093c7414"
 
-# ✅ FIXED TENOR LINKS (c.tenor.com FORMAT)
+# ✅ YOUR GIFS (KEEP THESE)
 crab_gifs = [
-"https://c.tenor.com/4s8Kk7Y7k8gAAAAd/tenor.gif",
-"https://c.tenor.com/6Z3YvE8PpJQAAAAd/tenor.gif",
-"https://c.tenor.com/8d9b48c7a07f9dcbfcba1cc403a53d58/tenor.gif"
+"https://media.tenor.com/4s8Kk7Y7k8gAAAAd/crab-dance.gif",
+"https://media.tenor.com/6Z3YvE8PpJQAAAAd/crab-knife.gif",
+"https://media.tenor.com/8d9b48c7a07f9dcbfcba1cc403a53d58/tenor.gif"
 ]
 
 # ------------------------
-# DEX DATA (FDV FIX)
+# GET MC (FDV)
 # ------------------------
 def get_dex_data():
     try:
@@ -35,56 +35,28 @@ def get_dex_data():
         mc_raw = pair.get("fdv")
 
         if mc_raw is None:
-            return {"mc": "N/A"}
+            return "N/A"
 
         mc = float(mc_raw)
 
-        def format_num(n):
-            if n >= 1_000_000:
-                return f"${n/1_000_000:.2f}M"
-            elif n >= 1_000:
-                return f"${(int(n/100)/10):.1f}K"
-            return f"${int(n)}"
+        if mc >= 1_000_000:
+            return f"${mc/1_000_000:.2f}M"
+        elif mc >= 1_000:
+            return f"${(int(mc/100)/10):.1f}K"
+        return f"${int(mc)}"
 
-        return {"mc": format_num(mc)}
-
-    except Exception as e:
-        print("DEX ERROR:", e)
-        return {"mc": "N/A"}
+    except:
+        return "N/A"
 
 
 # ------------------------
-# UPDATE STATUS (GREEN TEXT)
+# 🔥 UPDATE GREEN NAME
 # ------------------------
-async def update_mc_status():
+async def update_mc():
     await bot.wait_until_ready()
 
     while True:
-        dex = get_dex_data()
-        mc = dex["mc"]
-
-        try:
-            await bot.change_presence(
-                activity=discord.Activity(
-                    type=discord.ActivityType.watching,
-                    name=f"MC - {mc}"
-                )
-            )
-        except:
-            pass
-
-        await asyncio.sleep(60)
-
-
-# ------------------------
-# UPDATE NICKNAME (REAL FIX)
-# ------------------------
-async def update_bot_nickname():
-    await bot.wait_until_ready()
-
-    while True:
-        dex = get_dex_data()
-        mc = dex["mc"]
+        mc = get_dex_data()
 
         for guild in bot.guilds:
             try:
@@ -92,7 +64,26 @@ async def update_bot_nickname():
             except:
                 pass
 
+        await bot.change_presence(
+            activity=discord.Activity(
+                type=discord.ActivityType.watching,
+                name=f"MC - {mc}"
+            )
+        )
+
         await asyncio.sleep(60)
+
+
+# ------------------------
+# SEND GIF (FIXED EMBED)
+# ------------------------
+async def send_gif(channel):
+    gif = random.choice(crab_gifs)
+
+    embed = discord.Embed(color=discord.Color.red())
+    embed.set_image(url=gif)
+
+    await channel.send(embed=embed)
 
 
 # ------------------------
@@ -105,8 +96,6 @@ class CrabButton(discord.ui.View):
     @discord.ui.button(label="CRAB", style=discord.ButtonStyle.danger)
     async def crab(self, interaction: discord.Interaction, button: discord.ui.Button):
 
-        gif = random.choice(crab_gifs)
-
         button.disabled = True
         button.label = "CRABBED"
 
@@ -116,8 +105,7 @@ class CrabButton(discord.ui.View):
             f"🦀 {interaction.user.mention} pressed the crab button 🦀"
         )
 
-        # ✅ GIF FIX
-        await interaction.followup.send(gif)
+        await send_gif(interaction.channel)
 
         if random.randint(1,777) == 1:
             await interaction.followup.send(
@@ -130,24 +118,18 @@ class CrabButton(discord.ui.View):
 # ------------------------
 @bot.event
 async def on_ready():
-    print(f"Crab bot online as {bot.user}")
-
-    bot.loop.create_task(update_mc_status())
-    bot.loop.create_task(update_bot_nickname())
+    print(f"Bot online as {bot.user}")
+    bot.loop.create_task(update_mc())
 
 
 # ------------------------
-# !crab
+# !crab (NO MC MESSAGE)
 # ------------------------
 @bot.command()
 async def crab(ctx):
     await ctx.message.delete()
 
-    gif = random.choice(crab_gifs)
-    dex = get_dex_data()
-
-    await ctx.send(gif)
-    await ctx.send(f"💰 MC: {dex['mc']}")
+    await send_gif(ctx.channel)
 
     if random.randint(1,777) == 1:
         await ctx.send(f"✨🦀 {ctx.author.mention} received the crab blessing 🦀✨")
@@ -174,9 +156,7 @@ async def crab_button(ctx):
 @bot.command()
 async def lock(ctx, minutes: int, raid_link: str = None):
 
-    global lock_active
-
-    if RAID_ROLE not in [role.name for role in ctx.author.roles]:
+    if RAID_ROLE not in [r.name for r in ctx.author.roles]:
         return
 
     await ctx.message.delete()
@@ -184,12 +164,9 @@ async def lock(ctx, minutes: int, raid_link: str = None):
     channel = ctx.channel
     guild = ctx.guild
 
-    lock_active = True
-
     for role in guild.roles:
         if role.permissions.administrator:
             continue
-
         overwrite = channel.overwrites_for(role)
         overwrite.send_messages = False
         await channel.set_permissions(role, overwrite=overwrite)
@@ -199,30 +176,20 @@ async def lock(ctx, minutes: int, raid_link: str = None):
     if raid_link:
         msg += f"\n⚔️ RAID HERE ⚔️\n{raid_link}\n"
 
-    countdown_msg = await ctx.send(msg + f"\n⏳ Unlocking in: {minutes} minutes")
+    countdown = await ctx.send(msg + f"\n⏳ {minutes} minutes")
 
-    await ctx.send(random.choice(crab_gifs))
+    await send_gif(channel)
 
-    remaining = minutes
-
-    while remaining > 0 and lock_active:
+    while minutes > 0:
         await asyncio.sleep(60)
-        remaining -= 1
-
-        if remaining > 0:
-            await countdown_msg.edit(
-                content=msg + f"\n⏳ Unlocking in: {remaining} minutes"
-            )
+        minutes -= 1
+        if minutes > 0:
+            await countdown.edit(content=msg + f"\n⏳ {minutes} minutes")
 
     for role in guild.roles:
-        if role.permissions.administrator:
-            continue
-
         overwrite = channel.overwrites_for(role)
         overwrite.send_messages = None
         await channel.set_permissions(role, overwrite=overwrite)
-
-    lock_active = False
 
     await ctx.send("🔓 Chat unlocked 🦀")
 
@@ -233,22 +200,15 @@ async def lock(ctx, minutes: int, raid_link: str = None):
 @bot.command()
 async def unlock(ctx):
 
-    global lock_active
-
-    if RAID_ROLE not in [role.name for role in ctx.author.roles]:
+    if RAID_ROLE not in [r.name for r in ctx.author.roles]:
         return
 
     await ctx.message.delete()
 
-    channel = ctx.channel
-    guild = ctx.guild
-
-    for role in guild.roles:
-        overwrite = channel.overwrites_for(role)
+    for role in ctx.guild.roles:
+        overwrite = ctx.channel.overwrites_for(role)
         overwrite.send_messages = None
-        await channel.set_permissions(role, overwrite=overwrite)
-
-    lock_active = False
+        await ctx.channel.set_permissions(role, overwrite=overwrite)
 
     await ctx.send("🔓 Emergency unlock 🦀")
 
