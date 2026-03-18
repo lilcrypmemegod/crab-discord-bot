@@ -16,7 +16,7 @@ lock_active = False
 RAID_ROLE = "Raid Commander"
 
 # ----------------
-# DEX DATA (STRICT MC FIX)
+# DEX DATA (FIXED MC)
 # ----------------
 
 def get_dex_data():
@@ -24,25 +24,27 @@ def get_dex_data():
         url = "https://api.dexscreener.com/latest/dex/pairs/cronos/0xdf9030e28cde0f4e6f11c65362c5e152093c7414"
         data = requests.get(url).json()["pair"]
 
-        # ✅ ONLY use marketCap (no FDV fallback)
         mc_raw = data.get("marketCap")
+        fdv_raw = data.get("fdv")
 
-        if mc_raw is None:
-            mc = "N/A"
-        else:
+        # 🔥 FIX: use LOWER value to match Dex UI
+        if mc_raw and fdv_raw:
+            mc = min(float(mc_raw), float(fdv_raw))
+        elif mc_raw:
             mc = float(mc_raw)
+        elif fdv_raw:
+            mc = float(fdv_raw)
+        else:
+            mc = 0
 
         liquidity = float(data["liquidity"]["usd"])
         change = float(data["priceChange"]["h24"])
 
         def format_num(n):
-            if isinstance(n, str):
-                return n
-
             if n >= 1_000_000:
                 return f"${n/1_000_000:.2f}M"
             elif n >= 1_000:
-                return f"${n/1_000:.1f}K"
+                return f"${round(n/1000,1)}K"
             return f"${n:.0f}"
 
         return {
@@ -67,7 +69,6 @@ async def rotate_status():
     await bot.wait_until_ready()
 
     while not bot.is_closed():
-
         data = get_dex_data()
 
         statuses = [
@@ -178,7 +179,7 @@ async def crab_button(ctx):
 
 
 # ----------------
-# RAID COMMANDS
+# RAID LOCK
 # ----------------
 
 @bot.command()
@@ -196,7 +197,7 @@ async def lock(ctx, minutes: int, raid_link: str):
     gif = random.choice(crab_gifs)
 
     message = await ctx.send(
-        f"🚨🦀 **RAID ALERT** 🦀🚨\n"
+        f"🚨🦀 RAID ALERT 🦀🚨\n"
         f"@everyone\n\n"
         f"⚔ RAID HERE ⚔\n{raid_link}\n\n"
         f"🔒 Chat locked\n"
@@ -218,7 +219,7 @@ async def lock(ctx, minutes: int, raid_link: str):
         if remaining > 0:
             await message.edit(
                 content=
-                f"🚨🦀 **RAID ALERT** 🦀🚨\n"
+                f"🚨🦀 RAID ALERT 🦀🚨\n"
                 f"@everyone\n\n"
                 f"⚔ RAID HERE ⚔\n{raid_link}\n\n"
                 f"🔒 Chat locked\n"
