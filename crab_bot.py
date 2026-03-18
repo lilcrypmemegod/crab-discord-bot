@@ -4,6 +4,8 @@ import random
 import asyncio
 import os
 import requests
+import aiohttp
+import io
 
 TOKEN = os.getenv("TOKEN")
 
@@ -17,7 +19,7 @@ lock_active = False
 
 DEX_URL = "https://api.dexscreener.com/latest/dex/pairs/cronos/0xdf9030e28cde0f4e6f11c65362c5e152093c7414"
 
-# ✅ YOUR TENOR GIFS (WORK WITH EMBEDS)
+# ✅ YOUR GIF LINKS (KEEP YOUR TENOR LINKS)
 crab_gifs = [
 "https://media.tenor.com/4s8Kk7Y7k8gAAAAd/crab-dance.gif",
 "https://media.tenor.com/6Z3YvE8PpJQAAAAd/crab-knife.gif",
@@ -43,7 +45,7 @@ def get_mc():
 
 
 # ------------------------
-# 🔥 UPDATE BOT NAME (GREEN)
+# UPDATE BOT NAME (GREEN)
 # ------------------------
 async def update_mc():
     await bot.wait_until_ready()
@@ -68,15 +70,22 @@ async def update_mc():
 
 
 # ------------------------
-# ✅ FORCE GIF EMBED (THIS FIXES EVERYTHING)
+# ✅ FINAL GIF FIX (SEND AS FILE)
 # ------------------------
 async def send_gif(channel):
-    gif = random.choice(crab_gifs)
+    gif_url = random.choice(crab_gifs)
 
-    embed = discord.Embed(color=discord.Color.red())
-    embed.set_image(url=gif)
-
-    await channel.send(embed=embed)
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(gif_url) as resp:
+                if resp.status == 200:
+                    data = await resp.read()
+                    file = discord.File(io.BytesIO(data), filename="crab.gif")
+                    await channel.send(file=file)
+                else:
+                    await channel.send("🦀")
+    except:
+        await channel.send("🦀")
 
 
 # ------------------------
@@ -98,7 +107,6 @@ class CrabButton(discord.ui.View):
             f"🦀 {interaction.user.mention} pressed the crab button 🦀"
         )
 
-        # ✅ FIXED GIF
         await send_gif(interaction.channel)
 
         if random.randint(1,777) == 1:
@@ -117,7 +125,7 @@ async def on_ready():
 
 
 # ------------------------
-# !crab (CLEAN)
+# !crab
 # ------------------------
 @bot.command()
 async def crab(ctx):
@@ -161,6 +169,7 @@ async def lock(ctx, minutes: int, raid_link: str = None):
     for role in guild.roles:
         if role.permissions.administrator:
             continue
+
         overwrite = channel.overwrites_for(role)
         overwrite.send_messages = False
         await channel.set_permissions(role, overwrite=overwrite)
