@@ -16,7 +16,7 @@ lock_active = False
 RAID_ROLE = "Raid Commander"
 
 # ----------------
-# DEX DATA
+# DEX DATA (FIXED MC)
 # ----------------
 
 def get_dex_data():
@@ -24,7 +24,8 @@ def get_dex_data():
         url = "https://api.dexscreener.com/latest/dex/pairs/cronos/0xdf9030e28cde0f4e6f11c65362c5e152093c7414"
         data = requests.get(url).json()["pair"]
 
-        mc = float(data["fdv"])
+        # ✅ FIX: use marketCap instead of fdv
+        mc = float(data.get("marketCap", data.get("fdv", 0)))
         liquidity = float(data["liquidity"]["usd"])
         change = float(data["priceChange"]["h24"])
 
