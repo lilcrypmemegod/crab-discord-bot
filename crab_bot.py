@@ -17,7 +17,7 @@ lock_active = False
 
 DEX_URL = "https://api.dexscreener.com/latest/dex/pairs/cronos/0xdf9030e28cde0f4e6f11c65362c5e152093c7414"
 
-# ✅ YOUR GIFS (KEEP THESE)
+# ✅ YOUR TENOR GIFS (WORK WITH EMBEDS)
 crab_gifs = [
 "https://media.tenor.com/4s8Kk7Y7k8gAAAAd/crab-dance.gif",
 "https://media.tenor.com/6Z3YvE8PpJQAAAAd/crab-knife.gif",
@@ -27,36 +27,29 @@ crab_gifs = [
 # ------------------------
 # GET MC (FDV)
 # ------------------------
-def get_dex_data():
+def get_mc():
     try:
         data = requests.get(DEX_URL).json()
         pair = data["pairs"][0]
-
-        mc_raw = pair.get("fdv")
-
-        if mc_raw is None:
-            return "N/A"
-
-        mc = float(mc_raw)
+        mc = float(pair.get("fdv", 0))
 
         if mc >= 1_000_000:
             return f"${mc/1_000_000:.2f}M"
         elif mc >= 1_000:
             return f"${(int(mc/100)/10):.1f}K"
         return f"${int(mc)}"
-
     except:
         return "N/A"
 
 
 # ------------------------
-# 🔥 UPDATE GREEN NAME
+# 🔥 UPDATE BOT NAME (GREEN)
 # ------------------------
 async def update_mc():
     await bot.wait_until_ready()
 
     while True:
-        mc = get_dex_data()
+        mc = get_mc()
 
         for guild in bot.guilds:
             try:
@@ -75,7 +68,7 @@ async def update_mc():
 
 
 # ------------------------
-# SEND GIF (FIXED EMBED)
+# ✅ FORCE GIF EMBED (THIS FIXES EVERYTHING)
 # ------------------------
 async def send_gif(channel):
     gif = random.choice(crab_gifs)
@@ -105,6 +98,7 @@ class CrabButton(discord.ui.View):
             f"🦀 {interaction.user.mention} pressed the crab button 🦀"
         )
 
+        # ✅ FIXED GIF
         await send_gif(interaction.channel)
 
         if random.randint(1,777) == 1:
@@ -123,7 +117,7 @@ async def on_ready():
 
 
 # ------------------------
-# !crab (NO MC MESSAGE)
+# !crab (CLEAN)
 # ------------------------
 @bot.command()
 async def crab(ctx):
