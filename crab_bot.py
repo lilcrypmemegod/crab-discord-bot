@@ -90,44 +90,35 @@ async def lock(ctx, minutes: int, raid_link: str):
 
     gif = random.choice(crab_gifs)
 
-    # RAID ALERT MESSAGE FIRST (FAST)
-    raid_message = await ctx.send(
+    message = await ctx.send(
         f"🚨🦀 **RAID ALERT** 🦀🚨\n"
         f"@everyone\n\n"
-        f"⚔️ RAID HERE ⚔️\n{raid_link}\n\n"
-        f"🔒 Chat locking..."
+        f"⚔ RAID HERE ⚔\n{raid_link}\n\n"
+        f"🔒 Chat locked\n"
+        f"⏳ Unlocking in: {minutes} minutes"
     )
 
     await ctx.send(gif)
 
-    # LOCK CHAT FAST
     overwrite = channel.overwrites_for(guild.default_role)
     overwrite.send_messages = False
     await channel.set_permissions(guild.default_role, overwrite=overwrite)
-
-    await raid_message.edit(
-        content=
-        f"🚨🦀 **RAID ALERT** 🦀🚨\n"
-        f"@everyone\n\n"
-        f"⚔️ RAID HERE ⚔️\n{raid_link}\n\n"
-        f"🔒 Chat locked\n"
-        f"⏳ Unlocking in: {minutes} minutes"
-    )
 
     remaining = minutes
 
     while remaining > 0 and lock_active:
 
         await asyncio.sleep(60)
+
         remaining -= 1
 
         if remaining > 0:
 
-            await raid_message.edit(
+            await message.edit(
                 content=
                 f"🚨🦀 **RAID ALERT** 🦀🚨\n"
                 f"@everyone\n\n"
-                f"⚔️ RAID HERE ⚔️\n{raid_link}\n\n"
+                f"⚔ RAID HERE ⚔\n{raid_link}\n\n"
                 f"🔒 Chat locked\n"
                 f"⏳ Unlocking in: {remaining} minutes"
             )
@@ -137,6 +128,8 @@ async def lock(ctx, minutes: int, raid_link: str):
         overwrite = channel.overwrites_for(guild.default_role)
         overwrite.send_messages = None
         await channel.set_permissions(guild.default_role, overwrite=overwrite)
+
+        await ctx.send("🔓 Chat unlocked 🦀")
 
     lock_active = False
 
@@ -156,6 +149,8 @@ async def unlock(ctx):
     overwrite = channel.overwrites_for(guild.default_role)
     overwrite.send_messages = None
     await channel.set_permissions(guild.default_role, overwrite=overwrite)
+
+    await ctx.send("🔓 Chat unlocked 🦀")
 
 
 bot.run(TOKEN)
