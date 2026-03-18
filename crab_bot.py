@@ -15,24 +15,70 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 lock_active = False
 RAID_ROLE = "Raid Commander"
 
-# DEXSCREENER FUNCTION
-def get_mc():
+# ----------------
+# DEX DATA
+# ----------------
+
+def get_dex_data():
     try:
         url = "https://api.dexscreener.com/latest/dex/pairs/cronos/0xdf9030e28cde0f4e6f11c65362c5e152093c7414"
-        data = requests.get(url).json()
+        data = requests.get(url).json()["pair"]
 
-        mc = float(data["pair"]["fdv"])
+        mc = float(data["fdv"])
+        liquidity = float(data["liquidity"]["usd"])
+        change = float(data["priceChange"]["h24"])
 
-        if mc >= 1_000_000:
-            return f"${mc/1_000_000:.2f}M"
-        elif mc >= 1_000:
-            return f"${mc/1_000:.1f}K"
-        else:
-            return f"${mc:.0f}"
+        def format_num(n):
+            if n >= 1_000_000:
+                return f"${n/1_000_000:.2f}M"
+            elif n >= 1_000:
+                return f"${n/1_000:.1f}K"
+            return f"${n:.0f}"
+
+        return {
+            "mc": format_num(mc),
+            "liq": format_num(liquidity),
+            "change": f"{change:+.2f}%"
+        }
 
     except:
-        return "MC unavailable"
+        return {
+            "mc": "N/A",
+            "liq": "N/A",
+            "change": "N/A"
+        }
 
+
+# ----------------
+# ROTATING STATUS
+# ----------------
+
+async def rotate_status():
+    await bot.wait_until_ready()
+
+    while not bot.is_closed():
+
+        data = get_dex_data()
+
+        statuses = [
+            f"MC - {data['mc']}",
+            f"Liquidity - {data['liq']}",
+            f"24H - {data['change']}"
+        ]
+
+        for status in statuses:
+            await bot.change_presence(
+                activity=discord.Activity(
+                    type=discord.ActivityType.watching,
+                    name=status
+                )
+            )
+            await asyncio.sleep(15)
+
+
+# ----------------
+# CRAB GIFS
+# ----------------
 
 crab_gifs = [
 "https://tenor.com/view/licking-knife-crabby-crab-pikaole-threatening-menacing-gif-23124736",
@@ -43,11 +89,19 @@ crab_gifs = [
 ]
 
 
+# ----------------
+# ROLE CHECK
+# ----------------
+
 def is_raid_commander():
     async def predicate(ctx):
         return any(role.name == RAID_ROLE for role in ctx.author.roles)
     return commands.check(predicate)
 
+
+# ----------------
+# BUTTON
+# ----------------
 
 class CrabButton(discord.ui.View):
 
@@ -58,7 +112,6 @@ class CrabButton(discord.ui.View):
     async def crab(self, interaction: discord.Interaction, button: discord.ui.Button):
 
         gif = random.choice(crab_gifs)
-        mc = get_mc()
 
         button.disabled = True
         button.label = "CRABBED"
@@ -69,7 +122,7 @@ class CrabButton(discord.ui.View):
             f"🦀 {interaction.user.mention} pressed the crab button 🦀"
         )
 
-        await interaction.followup.send(f"{gif}\n💰 MC: {mc}")
+        await interaction.followup.send(gif)
 
         if random.randint(1,777) == 1:
             await interaction.followup.send(
@@ -77,9 +130,14 @@ class CrabButton(discord.ui.View):
             )
 
 
+# ----------------
+# READY
+# ----------------
+
 @bot.event
 async def on_ready():
     print(f"Crab bot online as {bot.user}")
+    bot.loop.create_task(rotate_status())
 
 
 # ----------------
@@ -90,9 +148,7 @@ async def on_ready():
 async def crab(ctx):
 
     gif = random.choice(crab_gifs)
-    mc = get_mc()
-
-    await ctx.send(f"{gif}\n💰 MC: {mc}")
+    await ctx.send(gif)
 
     if random.randint(1,777) == 1:
         await ctx.send(
@@ -146,7 +202,6 @@ async def lock(ctx, minutes: int, raid_link: str):
     remaining = minutes
 
     while remaining > 0 and lock_active:
-
         await asyncio.sleep(60)
         remaining -= 1
 
@@ -161,7 +216,6 @@ async def lock(ctx, minutes: int, raid_link: str):
             )
 
     if lock_active:
-
         overwrite = channel.overwrites_for(guild.default_role)
         overwrite.send_messages = None
         await channel.set_permissions(guild.default_role, overwrite=overwrite)
