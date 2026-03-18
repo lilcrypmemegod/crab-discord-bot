@@ -4,6 +4,9 @@ import random
 import asyncio
 import os
 import requests
+import aiohttp
+import io
+import re
 
 TOKEN = os.getenv("TOKEN")
 
@@ -16,7 +19,6 @@ RAID_ROLE = "Raid Commander"
 
 DEX_URL = "https://api.dexscreener.com/latest/dex/pairs/cronos/0xdf9030e28cde0f4e6f11c65362c5e152093c7414"
 
-# ✅ YOUR TENOR LINKS (UNCHANGED)
 crab_gifs = [
 "https://tenor.com/view/licking-knife-crabby-crab-pikaole-threatening-menacing-gif-23124736",
 "https://tenor.com/view/fighting-crab-crab-with-a-knife-hes-got-a-knife-dont-touch-me-bro-get-off-gif-18793247",
@@ -26,7 +28,7 @@ crab_gifs = [
 ]
 
 # ------------------------
-# GET MC (FDV)
+# GET MC
 # ------------------------
 def get_mc():
     try:
@@ -42,9 +44,8 @@ def get_mc():
     except:
         return "N/A"
 
-
 # ------------------------
-# UPDATE BOT NAME (GREEN)
+# UPDATE BOT NAME
 # ------------------------
 async def update_mc():
     await bot.wait_until_ready()
@@ -60,23 +61,38 @@ async def update_mc():
 
         await asyncio.sleep(60)
 
+# ------------------------
+# 🔥 REAL TENOR → GIF FIX
+# ------------------------
+async def get_real_gif(url):
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as resp:
+                html = await resp.text()
 
-# ------------------------
-# ✅ FIXED GIF SENDER (TENOR EMBED)
-# ------------------------
+                match = re.search(r'https://media\.tenor\.com/[^"]+\.gif', html)
+                if match:
+                    return match.group(0)
+    except:
+        return None
+
 async def send_gif(channel):
     url = random.choice(crab_gifs)
 
-    # convert tenor view → embed
-    if "tenor.com/view" in url:
+    real_gif = await get_real_gif(url)
+
+    if real_gif:
         try:
-            gif_id = url.split("-")[-1]
-            url = f"https://tenor.com/embed/{gif_id}"
+            async with aiohttp.ClientSession() as session:
+                async with session.get(real_gif) as resp:
+                    data = await resp.read()
+                    file = discord.File(io.BytesIO(data), filename="crab.gif")
+                    await channel.send(file=file)
+                    return
         except:
             pass
 
-    await channel.send(url)
-
+    await channel.send("❌ gif failed")
 
 # ------------------------
 # BUTTON
@@ -99,12 +115,6 @@ class CrabButton(discord.ui.View):
 
         await send_gif(interaction.channel)
 
-        if random.randint(1,777) == 1:
-            await interaction.followup.send(
-                f"✨🦀 {interaction.user.mention} received the crab blessing 🦀✨"
-            )
-
-
 # ------------------------
 # READY
 # ------------------------
@@ -113,26 +123,18 @@ async def on_ready():
     print(f"Bot online as {bot.user}")
     bot.loop.create_task(update_mc())
 
-
 # ------------------------
-# !crab
+# !crab (VISIBLE NOW ✅)
 # ------------------------
 @bot.command()
 async def crab(ctx):
-    await ctx.message.delete()
-
     await send_gif(ctx.channel)
 
-    if random.randint(1,777) == 1:
-        await ctx.send(f"✨🦀 {ctx.author.mention} received the crab blessing 🦀✨")
-
-
 # ------------------------
-# !CRAB BUTTON
+# !CRAB BUTTON (VISIBLE)
 # ------------------------
 @bot.command(name="CRAB")
 async def crab_button(ctx):
-    await ctx.message.delete()
 
     embed = discord.Embed(
         description="🚨 DO NOT PRESS THE CRAB BUTTON 🚨",
@@ -140,7 +142,6 @@ async def crab_button(ctx):
     )
 
     await ctx.send(embed=embed, view=CrabButton())
-
 
 # ------------------------
 # LOCK
@@ -150,8 +151,6 @@ async def lock(ctx, minutes: int, raid_link: str = None):
 
     if RAID_ROLE not in [r.name for r in ctx.author.roles]:
         return
-
-    await ctx.message.delete()
 
     channel = ctx.channel
     guild = ctx.guild
@@ -186,7 +185,6 @@ async def lock(ctx, minutes: int, raid_link: str = None):
 
     await ctx.send("🔓 Chat unlocked 🦀")
 
-
 # ------------------------
 # UNLOCK
 # ------------------------
@@ -196,14 +194,11 @@ async def unlock(ctx):
     if RAID_ROLE not in [r.name for r in ctx.author.roles]:
         return
 
-    await ctx.message.delete()
-
     for role in ctx.guild.roles:
         overwrite = ctx.channel.overwrites_for(role)
         overwrite.send_messages = None
         await ctx.channel.set_permissions(role, overwrite=overwrite)
 
     await ctx.send("🔓 Emergency unlock 🦀")
-
 
 bot.run(TOKEN)
