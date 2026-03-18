@@ -15,24 +15,24 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 lock_active = False
 RAID_ROLE = "Raid Commander"
 
-# ✅ YOUR TOKEN PAIR (CRONOS)
 DEX_URL = "https://api.dexscreener.com/latest/dex/pairs/cronos/0xdf9030e28cde0f4e6f11c65362c5e152093c7414"
 
+# ✅ FIXED TENOR LINKS (c.tenor.com FORMAT)
 crab_gifs = [
-"https://media.tenor.com/4s8Kk7Y7k8gAAAAd/crab-dance.gif",
-"https://media.tenor.com/6Z3YvE8PpJQAAAAd/crab-knife.gif",
-"https://media.tenor.com/8d9b48c7a07f9dcbfcba1cc403a53d58/tenor.gif"
+"https://c.tenor.com/4s8Kk7Y7k8gAAAAd/tenor.gif",
+"https://c.tenor.com/6Z3YvE8PpJQAAAAd/tenor.gif",
+"https://c.tenor.com/8d9b48c7a07f9dcbfcba1cc403a53d58/tenor.gif"
 ]
 
 # ------------------------
-# DEX DATA (FINAL FIX - FDV)
+# DEX DATA (FDV FIX)
 # ------------------------
 def get_dex_data():
     try:
         data = requests.get(DEX_URL).json()
         pair = data["pairs"][0]
 
-        mc_raw = pair.get("fdv")  # ✅ THIS FIXES IT
+        mc_raw = pair.get("fdv")
 
         if mc_raw is None:
             return {"mc": "N/A"}
@@ -54,7 +54,7 @@ def get_dex_data():
 
 
 # ------------------------
-# 🔥 UPDATE STATUS (GREEN TEXT)
+# UPDATE STATUS (GREEN TEXT)
 # ------------------------
 async def update_mc_status():
     await bot.wait_until_ready()
@@ -77,7 +77,7 @@ async def update_mc_status():
 
 
 # ------------------------
-# 🔥 UPDATE NICKNAME (REAL FIX)
+# UPDATE NICKNAME (REAL FIX)
 # ------------------------
 async def update_bot_nickname():
     await bot.wait_until_ready()
@@ -116,6 +116,7 @@ class CrabButton(discord.ui.View):
             f"🦀 {interaction.user.mention} pressed the crab button 🦀"
         )
 
+        # ✅ GIF FIX
         await interaction.followup.send(gif)
 
         if random.randint(1,777) == 1:
@@ -145,7 +146,8 @@ async def crab(ctx):
     gif = random.choice(crab_gifs)
     dex = get_dex_data()
 
-    await ctx.send(f"{gif}\n💰 MC: {dex['mc']}")
+    await ctx.send(gif)
+    await ctx.send(f"💰 MC: {dex['mc']}")
 
     if random.randint(1,777) == 1:
         await ctx.send(f"✨🦀 {ctx.author.mention} received the crab blessing 🦀✨")
@@ -167,7 +169,7 @@ async def crab_button(ctx):
 
 
 # ------------------------
-# LOCK (RAID COMMANDER ONLY)
+# LOCK
 # ------------------------
 @bot.command()
 async def lock(ctx, minutes: int, raid_link: str = None):
@@ -212,7 +214,6 @@ async def lock(ctx, minutes: int, raid_link: str = None):
                 content=msg + f"\n⏳ Unlocking in: {remaining} minutes"
             )
 
-    # unlock
     for role in guild.roles:
         if role.permissions.administrator:
             continue
@@ -227,7 +228,7 @@ async def lock(ctx, minutes: int, raid_link: str = None):
 
 
 # ------------------------
-# EMERGENCY UNLOCK
+# UNLOCK
 # ------------------------
 @bot.command()
 async def unlock(ctx):
