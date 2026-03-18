@@ -15,7 +15,7 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 lock_active = False
 RAID_ROLE = "Raid Commander"
 
-# ✅ CORRECT DEX LINK (CRONOS)
+# ✅ YOUR TOKEN PAIR (CRONOS)
 DEX_URL = "https://api.dexscreener.com/latest/dex/pairs/cronos/0xdf9030e28cde0f4e6f11c65362c5e152093c7414"
 
 crab_gifs = [
@@ -25,15 +25,14 @@ crab_gifs = [
 ]
 
 # ------------------------
-# DEX DATA (FINAL FIX - USE FDV)
+# DEX DATA (FINAL FIX - FDV)
 # ------------------------
 def get_dex_data():
     try:
         data = requests.get(DEX_URL).json()
         pair = data["pairs"][0]
 
-        # ✅ USE FDV (matches Dex UI)
-        mc_raw = pair.get("fdv")
+        mc_raw = pair.get("fdv")  # ✅ THIS FIXES IT
 
         if mc_raw is None:
             return {"mc": "N/A"}
@@ -55,7 +54,7 @@ def get_dex_data():
 
 
 # ------------------------
-# 🔥 LIVE STATUS (GREEN NAME FIXED)
+# 🔥 UPDATE STATUS (GREEN TEXT)
 # ------------------------
 async def update_mc_status():
     await bot.wait_until_ready()
@@ -73,6 +72,25 @@ async def update_mc_status():
             )
         except:
             pass
+
+        await asyncio.sleep(60)
+
+
+# ------------------------
+# 🔥 UPDATE NICKNAME (REAL FIX)
+# ------------------------
+async def update_bot_nickname():
+    await bot.wait_until_ready()
+
+    while True:
+        dex = get_dex_data()
+        mc = dex["mc"]
+
+        for guild in bot.guilds:
+            try:
+                await guild.me.edit(nick=f"MC - {mc}")
+            except:
+                pass
 
         await asyncio.sleep(60)
 
@@ -112,7 +130,9 @@ class CrabButton(discord.ui.View):
 @bot.event
 async def on_ready():
     print(f"Crab bot online as {bot.user}")
+
     bot.loop.create_task(update_mc_status())
+    bot.loop.create_task(update_bot_nickname())
 
 
 # ------------------------
