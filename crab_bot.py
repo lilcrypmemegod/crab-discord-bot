@@ -12,6 +12,7 @@ intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 lock_active = False
+RAID_ROLE = "Raid Commander"
 
 crab_gifs = [
 "https://tenor.com/view/licking-knife-crabby-crab-pikaole-threatening-menacing-gif-23124736",
@@ -20,6 +21,12 @@ crab_gifs = [
 "https://tenor.com/view/caranguejo-pandlr-man-crab-knife-pandlrg-faca-caranguejo-gif-13381866007168454019",
 "https://tenor.com/view/crab-knife-fight-gif-7305809"
 ]
+
+
+def is_raid_commander():
+    async def predicate(ctx):
+        return any(role.name == RAID_ROLE for role in ctx.author.roles)
+    return commands.check(predicate)
 
 
 class CrabButton(discord.ui.View):
@@ -54,9 +61,7 @@ async def on_ready():
     print(f"Crab bot online as {bot.user}")
 
 
-# ----------------
-# VISIBLE COMMANDS
-# ----------------
+# PUBLIC COMMANDS
 
 @bot.command()
 async def crab(ctx):
@@ -76,12 +81,10 @@ async def crab_button(ctx):
     await ctx.send(embed=embed, view=CrabButton())
 
 
-# ----------------
-# HIDDEN COMMANDS
-# ----------------
+# RAID COMMANDS
 
 @bot.command()
-@commands.has_permissions(administrator=True)
+@is_raid_commander()
 async def lock(ctx, minutes: int, raid_link: str):
 
     global lock_active
@@ -139,7 +142,7 @@ async def lock(ctx, minutes: int, raid_link: str):
 
 
 @bot.command()
-@commands.has_permissions(administrator=True)
+@is_raid_commander()
 async def unlock(ctx):
 
     global lock_active
