@@ -44,7 +44,7 @@ def get_dex_data():
             if n >= 1_000_000:
                 return f"${n/1_000_000:.2f}M"
             elif n >= 1_000:
-                return f"${round(n/1000,1)}K"
+                return f"${(int(n/100) / 10):.1f}K"
             return f"${n:.0f}"
 
         return {
