@@ -4,7 +4,6 @@ import random
 import asyncio
 import os
 import requests
-import aiohttp
 import re
 
 TOKEN = os.getenv("TOKEN")
@@ -26,6 +25,27 @@ crab_gifs = [
 "https://tenor.com/view/caranguejo-pandlr-man-crab-knife-pandlrg-faca-caranguejo-gif-13381866007168454019",
 "https://tenor.com/view/crab-knife-fight-gif-7305809"
 ]
+
+# ------------------------
+# CONVERT TENOR → DIRECT GIF
+# ------------------------
+def convert_tenor(url):
+    match = re.search(r'-gif-(\d+)', url)
+    if match:
+        return f"https://media.tenor.com/{match.group(1)}/tenor.gif"
+    return None
+
+# ------------------------
+# SEND GIF (FIXED)
+# ------------------------
+async def send_gif(channel):
+    url = random.choice(crab_gifs)
+    gif = convert_tenor(url)
+
+    if gif:
+        await channel.send(gif)
+    else:
+        await channel.send("❌ gif failed")
 
 # ------------------------
 # GET MC (ACCURATE)
@@ -66,35 +86,6 @@ async def update_mc():
                 pass
 
         await asyncio.sleep(60)
-
-# ------------------------
-# EXTRACT REAL GIF
-# ------------------------
-async def get_real_gif(url):
-    try:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url) as resp:
-                html = await resp.text()
-
-                match = re.search(r'https://media\.tenor\.com/[^"]+\.gif', html)
-                if match:
-                    return match.group(0)
-    except:
-        pass
-
-    return None
-
-# ------------------------
-# SEND GIF
-# ------------------------
-async def send_gif(channel):
-    url = random.choice(crab_gifs)
-    gif = await get_real_gif(url)
-
-    if gif:
-        await channel.send(gif)
-    else:
-        await channel.send("❌ gif failed")
 
 # ------------------------
 # BUTTON
