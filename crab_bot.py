@@ -16,13 +16,13 @@ RAID_ROLE = "Raid Commander"
 
 DEX_URL = "https://api.dexscreener.com/latest/dex/pairs/cronos/0xdf9030e28cde0f4e6f11c65362c5e152093c7414"
 
-# ✅ YOUR GIFS (FIXED DIRECT LINKS)
+# ✅ YOUR EXACT GIFS (FIXED ONLY FOR DISPLAY)
 crab_gifs = [
     "https://media.tenor.com/8d9b48c7a07f9dcbfcba1cc403a53d58/tenor.gif",
     "https://media.tenor.com/6Z3YvE8PpJQAAAAd/tenor.gif",
-    "https://media.tenor.com/Ym3s7Y2Fz7QAAAAd/tenor.gif",
-    "https://media.tenor.com/l1R0b4z1X9oAAAAd/tenor.gif",
-    "https://media.tenor.com/X7S0B5X9Wz0AAAAd/tenor.gif"
+    "https://media.tenor.com/8684191936841762266/tenor.gif",
+    "https://media.tenor.com/13381866007168454019/tenor.gif",
+    "https://media.tenor.com/7305809/tenor.gif"
 ]
 
 # ------------------------
@@ -70,7 +70,11 @@ async def update_mc():
 # ------------------------
 async def send_gif(channel):
     gif = random.choice(crab_gifs)
-    await channel.send(gif)
+
+    embed = discord.Embed()
+    embed.set_image(url=gif)
+
+    await channel.send(embed=embed)
 
 # ------------------------
 # BUTTON
@@ -115,7 +119,7 @@ async def crab(ctx):
         )
 
 # ------------------------
-# !CRAB BUTTON
+# !CRAB
 # ------------------------
 @bot.command(name="CRAB")
 async def crab_button(ctx):
@@ -128,7 +132,7 @@ async def crab_button(ctx):
     await ctx.send(embed=embed, view=CrabButton())
 
 # ------------------------
-# LOCKDOWN
+# LOCK
 # ------------------------
 @bot.command()
 async def lock(ctx, minutes: int, raid_link: str = None):
