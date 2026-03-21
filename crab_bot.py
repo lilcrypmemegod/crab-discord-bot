@@ -16,13 +16,13 @@ RAID_ROLE = "Raid Commander"
 
 DEX_URL = "https://api.dexscreener.com/latest/dex/pairs/cronos/0xdf9030e28cde0f4e6f11c65362c5e152093c7414"
 
-# ✅ YOUR EXACT GIFS (FIXED ONLY FOR DISPLAY)
+# ✅ YOUR ORIGINAL GIFS (UNCHANGED)
 crab_gifs = [
-    "https://media.tenor.com/8d9b48c7a07f9dcbfcba1cc403a53d58/tenor.gif",
-    "https://media.tenor.com/6Z3YvE8PpJQAAAAd/tenor.gif",
-    "https://media.tenor.com/8684191936841762266/tenor.gif",
-    "https://media.tenor.com/13381866007168454019/tenor.gif",
-    "https://media.tenor.com/7305809/tenor.gif"
+    "https://tenor.com/view/licking-knife-crabby-crab-pikaole-threatening-menacing-gif-23124736",
+    "https://tenor.com/view/fighting-crab-crab-with-a-knife-hes-got-a-knife-dont-touch-me-bro-get-off-gif-18793247",
+    "https://tenor.com/view/threat-crabby-stabby-knife-stab-angry-gif-8684191936841762266",
+    "https://tenor.com/view/caranguejo-pandlr-man-crab-knife-pandlrg-faca-caranguejo-gif-13381866007168454019",
+    "https://tenor.com/view/crab-knife-fight-gif-7305809"
 ]
 
 # ------------------------
@@ -66,15 +66,11 @@ async def update_mc():
         await asyncio.sleep(60)
 
 # ------------------------
-# SEND GIF (FIXED)
+# SEND GIF (WORKING VERSION)
 # ------------------------
 async def send_gif(channel):
     gif = random.choice(crab_gifs)
-
-    embed = discord.Embed()
-    embed.set_image(url=gif)
-
-    await channel.send(embed=embed)
+    await channel.send(gif)
 
 # ------------------------
 # BUTTON
@@ -119,7 +115,7 @@ async def crab(ctx):
         )
 
 # ------------------------
-# !CRAB
+# !CRAB BUTTON
 # ------------------------
 @bot.command(name="CRAB")
 async def crab_button(ctx):
@@ -132,7 +128,7 @@ async def crab_button(ctx):
     await ctx.send(embed=embed, view=CrabButton())
 
 # ------------------------
-# LOCK
+# LOCKDOWN
 # ------------------------
 @bot.command()
 async def lock(ctx, minutes: int, raid_link: str = None):
