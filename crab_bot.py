@@ -4,7 +4,6 @@ import random
 import asyncio
 import os
 import requests
-import re
 
 TOKEN = os.getenv("TOKEN")
 
@@ -17,38 +16,17 @@ RAID_ROLE = "Raid Commander"
 
 DEX_URL = "https://api.dexscreener.com/latest/dex/pairs/cronos/0xdf9030e28cde0f4e6f11c65362c5e152093c7414"
 
-# ✅ YOUR GIFS (UNCHANGED)
+# ✅ YOUR GIFS (FIXED DIRECT LINKS)
 crab_gifs = [
-"https://tenor.com/view/licking-knife-crabby-crab-pikaole-threatening-menacing-gif-23124736",
-"https://tenor.com/view/fighting-crab-crab-with-a-knife-hes-got-a-knife-dont-touch-me-bro-get-off-gif-18793247",
-"https://tenor.com/view/threat-crabby-stabby-knife-stab-angry-gif-8684191936841762266",
-"https://tenor.com/view/caranguejo-pandlr-man-crab-knife-pandlrg-faca-caranguejo-gif-13381866007168454019",
-"https://tenor.com/view/crab-knife-fight-gif-7305809"
+    "https://media.tenor.com/8d9b48c7a07f9dcbfcba1cc403a53d58/tenor.gif",
+    "https://media.tenor.com/6Z3YvE8PpJQAAAAd/tenor.gif",
+    "https://media.tenor.com/Ym3s7Y2Fz7QAAAAd/tenor.gif",
+    "https://media.tenor.com/l1R0b4z1X9oAAAAd/tenor.gif",
+    "https://media.tenor.com/X7S0B5X9Wz0AAAAd/tenor.gif"
 ]
 
 # ------------------------
-# CONVERT TENOR → DIRECT GIF
-# ------------------------
-def convert_tenor(url):
-    match = re.search(r'-gif-(\d+)', url)
-    if match:
-        return f"https://media.tenor.com/{match.group(1)}/tenor.gif"
-    return None
-
-# ------------------------
-# SEND GIF (FIXED)
-# ------------------------
-async def send_gif(channel):
-    url = random.choice(crab_gifs)
-    gif = convert_tenor(url)
-
-    if gif:
-        await channel.send(gif)
-    else:
-        await channel.send("❌ gif failed")
-
-# ------------------------
-# GET MC (ACCURATE)
+# GET MC
 # ------------------------
 def get_mc():
     try:
@@ -86,6 +64,13 @@ async def update_mc():
                 pass
 
         await asyncio.sleep(60)
+
+# ------------------------
+# SEND GIF (FIXED)
+# ------------------------
+async def send_gif(channel):
+    gif = random.choice(crab_gifs)
+    await channel.send(gif)
 
 # ------------------------
 # BUTTON
@@ -126,11 +111,11 @@ async def crab(ctx):
 
     if random.randint(1,777) == 1:
         await ctx.send(
-            f"✨🦀 {ctx.author.mention} you have received the crab blessing the crab gods have blessed you 🦀✨"
+            f"✨🦀 {ctx.author.mention} you have received the crab blessing 🦀✨"
         )
 
 # ------------------------
-# !CRAB
+# !CRAB BUTTON
 # ------------------------
 @bot.command(name="CRAB")
 async def crab_button(ctx):
@@ -143,7 +128,7 @@ async def crab_button(ctx):
     await ctx.send(embed=embed, view=CrabButton())
 
 # ------------------------
-# LOCK (REAL LOCKDOWN)
+# LOCKDOWN
 # ------------------------
 @bot.command()
 async def lock(ctx, minutes: int, raid_link: str = None):
